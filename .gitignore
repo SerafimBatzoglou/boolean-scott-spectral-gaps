@@ -1,0 +1,4 @@
+.lake/
+dist/
+tmp/
+.DS_Store
