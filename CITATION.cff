@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "For this private review draft, cite the project and the exact Git commit."
+title: "Unbounded minimum Scott ranks for Boolean algebras"
+type: software
+authors:
+  - name: "Boolean Scott Spectral Gaps project"
+repository-code: "https://github.com/SerafimBatzoglou/boolean-scott-spectral-gaps"
+keywords:
+  - Boolean algebras
+  - Scott rank
+  - infinitary logic
+  - Lean
+abstract: >-
+  A Lean formalization showing that for every countable ordinal b, some
+  satisfiable pure Boolean sentence of complexity Pi_(omega+4) has no
+  countable model of Scott rank at most b.

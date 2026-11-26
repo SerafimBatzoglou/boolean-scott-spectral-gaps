@@ -1,0 +1,248 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype,amsmath,amssymb,amsthm}
+\usepackage[margin=1.05in]{geometry}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,linkcolor=black,urlcolor=blue!55!black,citecolor=black,pdftitle={Unbounded minimum Scott ranks for Boolean algebras}]{hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem*{criterion}{Absorption criterion}
+\newcommand{\N}{\mathbb N}
+\newcommand{\Clop}{\operatorname{Clop}}
+\newcommand{\code}[2]{\href{https://github.com/SerafimBatzoglou/boolean-scott-spectral-gaps/blob/e1b9ab53208242a9da1efc2336e61db9c1a5566c/BooleanScott/#1.lean}{#2}}
+\title{Unbounded minimum Scott ranks\\for Boolean algebras}
+\author{Boolean Scott Spectral Gaps project}
+\date{Proof overview for private review\\November 26, 2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+For every countable ordinal \(b\), there is a satisfiable pure Boolean
+\(\Pi_{\omega+4}\) sentence whose countable models all have Scott rank greater
+than \(b\). This gives a negative answer to the existence question of Gonzalez
+and Harrison-Trainor at one fixed input complexity. We describe how a tree
+controls absorption of a fixed Boolean factor in every model of a sentence,
+and how a descriptive-set-theoretic argument turns that criterion into a
+lower bound on the least model rank. The accompanying Lean formalization
+includes the infinitary syntax, the topological construction and the final
+passage to arbitrary structures in the Boolean signature.
+\end{abstract}
+
+\section{The question and the rank convention}
+A Scott sentence for a countable structure \(A\) is a sentence of
+\(L_{\omega_1\omega}\) whose countable models are precisely the isomorphic
+copies of \(A\). We use the parameterless convention of
+Gonzalez and Harrison-Trainor~\cite{ght}. The rank of \(A\) is at most \(b\)
+if it admits a \(\Pi_{b+1}\) Scott sentence. Question~1.9 of their paper asks
+whether fixing the complexity of a satisfiable sentence extending Boolean
+algebra theory bounds the least Scott rank among its models.
+\begin{theorem}\label{thm}
+For each \(b<\omega_1\) there exists a \(\Pi_{\omega+4}\) sentence
+\(\varphi_b\) in the signature \(0,1,\neg,\wedge,\vee\) such that
+\begin{enumerate}
+\item every structure satisfying \(\varphi_b\) obeys the Boolean algebra
+equations and has \(0\ne1\),
+\item some countable Boolean algebra satisfies \(\varphi_b\), and
+\item no countable model of \(\varphi_b\) admits a \(\Pi_{b+1}\) Scott
+sentence among all countable structures in this signature.
+\end{enumerate}
+\end{theorem}
+The sentence can vary with \(b\). Its complexity has the same upper bound in
+every case. The theorem leaves open whether failure first occurs at a lower
+level. The \code{PureCounterexample}{final Lean declaration} gives these
+three clauses in this order.
+
+\section{A fixed factor and a family of sentences}
+Work first with countable Boolean algebras. By Stone duality an algebra \(A\)
+is the algebra of clopens of a compact zero-dimensional Hausdorff space \(X\).
+A product of two algebras corresponds to a disjoint union of their spaces.
+Write \(X\sqcup R\cong X\) when \(X\) absorbs a particular compact space \(R\).
+The construction supplies this fixed \(R\), and for trees
+\(T\subseteq\N^{<\omega}\) a pure \(\Pi_{\omega+4}\) sentence \(\Psi_T\)
+called the guard. Each guard has a countable Boolean model. Its clauses force
+the following statement throughout its countable model class.
+\begin{criterion}
+If \(\Clop(X)\models\Psi_T\), then \(X\sqcup R\cong X\) if and only if
+\(T\) has an infinite branch.
+\end{criterion}
+The universal quantifier over models is essential. A construction specifying
+just one space of high rank per tree would leave the least rank of a model
+undetermined. We first explain the geometry that gives this quantifier
+and then apply the criterion to prove the theorem.
+
+\subsection*{Recognizable pieces}
+For locally compact \(Y\), write \(Y^+\) for its one-point compactification.
+Set \(T_0=\{*\}\) and let \(T_{d+1}\) be the compactified disjoint union of
+countably many copies of \(T_d\). Let \(G_d\) be the compactified disjoint
+union of countably many copies of \(2^{\N}\sqcup T_d\), where \(2^{\N}\)
+is Cantor space. One can read \(d\) at the added point using only clopens.
+Indeed, let \(D\) be the closure of the isolated points, and define
+\[
+ M_j(X)=D\cap\overline{X\setminus D}\cap
+            \bigl(D^{(j+1)}\setminus D^{(j+2)}\bigr),
+\]
+where superscripts denote iterated derived sets. In \(G_d\) the Cantor
+pieces miss \(D\), and the towers lie in \(D\). Only the added point is
+approached by both sides. It belongs to \(D^{(d+1)}\) and drops out at
+the next derivative. Consequently \(M_j(G_d)\) consists of the added
+point if \(j=d\), and is empty otherwise. The test restricts to open
+subspaces. For each fixed \(j\), incidence of a clopen with \(M_j\) is
+expressible at a finite level of the pure Boolean hierarchy.
+
+A row \(R_{e,n}\) is the compactified sum of one \(G_{2j}\) for every
+\(j\ge n\) and infinitely many copies of \(G_{2e+1}\). The index \(e\)
+labels the row, while \(n\) specifies its first even column. For a nonempty
+set \(S\subseteq\N\), a chart \(C_S\) compactifies the sum of the rows
+\(R_{e,e+k}\), for \(e\in S\) and \(k\in\N\). Call its added point the
+vertex. In a chart the first derivative of the \(M_{2e+1}\) points picks
+out the roots of rows labeled \(e\) together with the vertex when \(e\in S\).
+Its second derivative consists of that vertex when \(e\in S\) and is empty
+otherwise. In column \(j\), only rows with \(e+k\le j\) can contribute.
+Every individual even column is therefore finite, even for infinite \(S\).
+
+\subsection*{How the tree enters the guard}
+Give every potential vertex its own private label, and each possible
+parent--child edge a separate label. The chart at \(v\) carries its private
+label and the labels of incident retained edges. An edge is retained when
+its child belongs to \(T\). The fixed summand \(R\) is the cutoff-zero
+row with the private label of the empty sequence. Use second derivatives
+of odd markers to identify each private vertex and to confine each retained
+edge's possible accumulation points to its endpoints. Require a clopen
+chart of the prescribed type around each vertex. Finally require that the
+set of vertices in any clopen be finite or cofinite and that each clopen
+containing infinitely many vertices contain a whole copy of \(G_{2j}\)
+for each \(j\). A witness is the compactified sum of all prescribed charts
+and infinitely many extra copies of each even packet. Its clopen algebra
+is countable. In any guarded space the vertices have a unique accumulation
+point \(t\). Two such points would give a clopen separating two infinite
+sets of vertices, and a vertex itself has a chart excluding all other vertices.
+
+Here the syntactic cost of specifying a chart matters. On each Boolean sign
+region of a tuple, equality of finite types gives the vertex bit, the counts
+of retained row roots of each label, and the marker counts in every column.
+Cut sufficiently far along the even columns of the retained rows. Only
+finitely many cutoffs lie below the cut. The retained arrays pair
+label-by-label, and eligible slots in each late column pair by finite
+bijections. These bijections can eventually preserve any fixed paired row
+in both directions, giving continuity at its root. The remaining finite
+pieces are classified by the mixed-packet counts and the heights of the
+residual towers. A retained row absorbs any bounded pure remainder and any
+finite number of its own repeated odd packet. In a sign region containing
+no row or vertex, a finite-level Scott test determines the whole region.
+The resulting homeomorphisms glue across signs, so all finite tests
+together determine tuple orbits. Each orbit in the countable chart has a
+\(\Pi_\omega\) definition by separating a representative from the countably
+many tuples outside its orbit. The extension clauses for these orbits give a
+\(\Pi_{\omega+2}\) Scott sentence. Relativizing to a principal interval
+preserves its complexity. Choosing a chart and imposing the requirements
+for every vertex yields the \(\Pi_{\omega+4}\) guard. See
+\code{ChartIsolation}{chart isolation} and \code{GuardSentence}{guard syntax}.
+
+\section{Why absorption detects exactly the branches}
+Suppose first that \(h:X\sqcup R\longrightarrow X\) is a homeomorphism.
+Choose disjoint clopen sectors about the vertices within their charts.
+Include \(R\) in the source root sector. Each private marker forces \(h\)
+to take its vertex to the same vertex. At \(v\), compare the image sector
+and the target sector. Their two differences are clopen and miss the vertex.
+Such a fragment has only finitely many retained row roots, and its marker
+count in every sufficiently late even column equals the total number of
+these roots. This follows by looking in the finitely many rows it meets
+and using convergence to each row root.
+
+Subtract the two finite counts for each row label, taking image minus
+target. The signed vector at \(v\) has finite support. In a late even column
+one can cancel the common intersection because the column count is finite.
+The sum of the signed coordinates is thus one at the root and zero at every
+other vertex. For a private label, the complement of its sector has finitely
+many roots of that label. Comparing the complementary counts forces the
+private coordinate to vanish. For an edge label, make the same comparison
+outside the \emph{union} of the two endpoint sectors. Its two signed
+coordinates sum to zero. This gives a locally finitely supported integer
+flow. The root has a positive outgoing coordinate. On following it, the
+parent coordinate at the next vertex is negative, so some child coordinate
+is again positive. Iteration produces a branch even at vertices of infinite
+degree. The cancellation and the iteration are proved in
+\code{AbsorptionNecessity}{absorption necessity} and
+\code{TagCurrents}{signed currents}.
+
+Conversely, take an infinite branch. At each of its vertices remove a row
+of the outgoing edge label from a clopen chart neighborhood, leaving a
+clopen base containing the vertex. The removed row may start at column
+\(n>0\). The reserve near \(t\) supplies one packet in each missing column
+\(j<n\), giving the type of a cutoff-zero row. With a base containing the
+vertex, two added cutoff-zero rows of different allowed labels can be
+exchanged: each affected label already occurs infinitely often, and the
+extra row contributes equally to each finite even column. The protected
+row pairing described above realizes this exchange by a homeomorphism.
+
+Choose disjoint sites consisting of the bases and their completed rows.
+Their convergence to \(t\) is needed for continuity. Enumerate the clopens
+and, at stage \(n\), choose the site within windows about the current vertex
+and \(t\) respecting the first \(n\) clopens and avoiding earlier sites.
+Distinct branch vertices converge to \(t\) by the finite-or-cofinite
+condition. Thus every neighborhood of \(t\) eventually contains the entire
+sites. Shift the rows one step along the branch, inserting \(R\) at the
+root. The local exchanges identify the new pieces with the old ones.
+The maps glue, fixing \(t\) and the exterior of the sites. This proves the
+criterion. See \code{BranchSchedule}{choice of sites} and
+\code{NegativeResolution}{the assembled equivalence}.
+
+\section{From all-model absorption to unbounded minimum rank}
+Fix \(b<\omega_1\). The formal proof uses a Baire-parameterized family
+\(T_c\) of trees with nonanalytic branchless set \(W\). For orientation,
+there is a universal family of sections whose branch parameters represent
+the ranges of continuous maps on Baire space. Taking the diagonal section
+gives \(T_c\). If \(W\) were analytic, its nonemptiness would give such a
+continuous parametrization. Substituting its own section code yields
+\(c\in W\) if and only if \(T_c\) has a branch.
+This is the diagonal contradiction in \code{Diagonal}{the tree construction}.
+
+Let \(B=\Clop(R)\). On operation tables for countably infinite algebras,
+write \(A\equiv_\gamma A'\) for the symmetric finite-block back-and-forth
+relation at the empty tuple. Isomorphism implies this relation at every
+countable level, and at level \(\gamma\) it transfers truth of
+\(\Pi_\gamma\) sentences. At a fixed countable level it is Borel in the
+tables, by recursion over smaller levels and quantification over finite
+tuples from countable sets. The guard relation is jointly Borel in the tree
+parameter and the table. In particular, testing for a prescribed chart can
+be done by Borel comparison with a presented chart of the known Scott
+bound. This avoids having to choose Scott sentences uniformly in \(c\).
+It follows that the following projection is analytic:
+\[
+ P_b=\{c:\exists A\ [\,A\text{ is a Boolean table satisfying }\Psi_{T_c}
+                 \ \land\ A\not\equiv_{b+1} A\times B\,]\}.
+\]
+If \(T_c\) has a branch, every guarded algebra is isomorphic to its product
+with \(B\). Thus \(P_b\subseteq W\). Since \(W\) is nonanalytic, choose
+\(c\in W\setminus P_b\). The guard for this \(c\) has a countable model.
+Every countable guarded algebra is infinite because the distinct private
+vertices require an infinite Stone space. It therefore has a presentation
+among the tables just considered. Each such algebra \(A\) satisfies
+\(A\equiv_{b+1} A\times B\), while the absence of a branch implies
+\(A\not\cong A\times B\). A \(\Pi_{b+1}\) Scott sentence for \(A\) would
+transfer to the countable product and would force an isomorphism. This rules
+out such a sentence for every countable guarded algebra.
+
+Finally conjoin the universal Boolean equations to the guard at the same
+positive \(\Pi\) level. Any satisfying operation structure now carries
+a Boolean algebra with exactly its given operations. The one-element
+algebra is already isolated among Boolean algebras by \(0=1\), hence cannot
+satisfy the guard. A Scott sentence isolating a countable model among all
+operation structures also isolates it among Boolean algebras, since an
+operation isomorphism preserves and reflects the order. This proves
+Theorem~\ref{thm}. The exact implications are in
+\code{Reduction}{the projection argument} and
+\code{PureCounterexample}{the raw-signature theorem}.
+
+\paragraph{Contributions and review.}
+The human project lead selected the question and directed the research.
+OpenAI Codex developed mathematical arguments, wrote Lean proofs, ran
+verification checks and drafted this exposition. Independent expert review
+of the correspondence between the original question, the formal statement
+and this overview is pending.
+
+\begin{thebibliography}{1}
+\bibitem{ght} David Gonzalez and Matthew Harrison-Trainor.
+\emph{Scott Spectral Gaps are Bounded for Linear Orderings}.
+arXiv:2411.12084v1 (2024), introduction and Question~1.9.
+\href{https://arxiv.org/html/2411.12084v1}{Full text}.
+\end{thebibliography}
+\end{document}
