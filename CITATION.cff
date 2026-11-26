@@ -2,6 +2,8 @@ cff-version: 1.2.0
 message: "For this private review draft, cite the project and the exact Git commit."
 title: "Unbounded minimum Scott ranks for Boolean algebras"
 type: software
+# Software license. See LICENSE.md for the manuscript and proof guide.
+license: Apache-2.0
 authors:
   - name: "Boolean Scott Spectral Gaps project"
 repository-code: "https://github.com/SerafimBatzoglou/boolean-scott-spectral-gaps"

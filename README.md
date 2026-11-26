@@ -39,4 +39,6 @@ To typeset the overview, run `mkdir -p dist` followed by `latexmk -pdf -outdir=d
 
 ## Contributions and review
 
-The human project lead selected the question and directed the research. OpenAI Codex developed mathematical arguments, wrote the Lean proofs, ran verification checks and drafted the exposition. The formal theorem can be checked against the pinned Lean environment. Independent expert review of the statement and its correspondence to Question 1.9 is pending. The private review draft uses a provisional project credit. [Citation metadata](CITATION.cff) · [Licensing status](LICENSE.md)
+The human project lead selected the question and directed the research. OpenAI Codex developed mathematical arguments, wrote the Lean proofs, ran verification checks and drafted the exposition. The formal theorem can be checked against the pinned Lean environment. Independent expert review of the statement and its correspondence to Question 1.9 is pending. The private review draft uses a provisional project credit. [Citation metadata](CITATION.cff)
+
+The proof code is available under Apache-2.0. The manuscript and proof guide are available under CC BY 4.0. [License texts and scope](LICENSE.md)
