@@ -1,5 +1,7 @@
 # Unbounded minimum Scott ranks for Boolean algebras
 
+GPT 6.2 Astra (Codex) with Serafim Batzoglou
+
 **For every countable ordinal $b$, there is a satisfiable pure Boolean $\Pi_{\omega+4}$ sentence whose countable models all have Scott rank greater than $b$.** The input sentence may depend on $b$. Its syntactic complexity has the same upper bound for every $b$.
 
 Gonzalez and Harrison-Trainor asked whether fixing the complexity of a sentence extending Boolean algebra theory bounds the least Scott rank of a model. The theorem gives a negative answer already at $\alpha=\omega+4$. Here rank at most $b$ means that the structure has a parameterless $\Pi_{b+1}$ Scott sentence. The first complexity level where such a bound fails remains a separate question. [Original question, §1.9](https://arxiv.org/html/2411.12084v1)
@@ -39,6 +41,6 @@ To typeset the overview, run `mkdir -p dist` followed by `latexmk -pdf -outdir=d
 
 ## Contributions and review
 
-The human project lead selected the question and directed the research. OpenAI Codex developed mathematical arguments, wrote the Lean proofs, ran verification checks and drafted the exposition. The formal theorem can be checked against the pinned Lean environment. Independent expert review of the statement and its correspondence to Question 1.9 is pending. The private review draft uses a provisional project credit. [Citation metadata](CITATION.cff)
+OpenAI Codex developed the mathematical argument and Lean formalization under the direction of Serafim Batzoglou. Batzoglou directed the proof search and requested adversarial checks. The formalization passed the documented Lean verification. Batzoglou has not yet read the proof in full or independently verified that the formal theorem resolves the original question. Independent expert review is pending. [Citation metadata](CITATION.cff)
 
 The proof code is available under Apache-2.0. The manuscript and proof guide are available under CC BY 4.0. [License texts and scope](LICENSE.md)

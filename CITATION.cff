@@ -1,11 +1,13 @@
 cff-version: 1.2.0
-message: "For this private review draft, cite the project and the exact Git commit."
+message: "For this private review draft, cite GPT 6.2 Astra (Codex) with Serafim Batzoglou and identify the exact Git commit."
 title: "Unbounded minimum Scott ranks for Boolean algebras"
 type: software
 # Software license. See LICENSE.md for the manuscript and proof guide.
 license: Apache-2.0
 authors:
-  - name: "Boolean Scott Spectral Gaps project"
+  - name: "GPT 6.2 Astra (Codex)"
+  - given-names: "Serafim"
+    family-names: "Batzoglou"
 repository-code: "https://github.com/SerafimBatzoglou/boolean-scott-spectral-gaps"
 keywords:
   - Boolean algebras
