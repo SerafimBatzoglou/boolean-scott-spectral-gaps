@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-message: "For this private review draft, cite GPT 6.2 Astra (Codex) with Serafim Batzoglou and identify the exact Git commit."
+message: "Please cite GPT 6.2 Astra (Codex) with Serafim Batzoglou and identify the exact Git commit."
 title: "Unbounded minimum Scott ranks for Boolean algebras"
 type: software
 # Software license. See LICENSE.md for the manuscript and proof guide.

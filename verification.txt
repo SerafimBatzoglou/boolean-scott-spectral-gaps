@@ -1,0 +1,321 @@
+Unbounded minimum Scott ranks for Boolean algebras
+Lean verification | 2026-11-26
+
+Proof inputs
+  Source repository    https://github.com/SerafimBatzoglou/boolean-scott-spectral-gaps
+  Git revision tested  1ae1919a6d97638ed519e0a358fa5e30c45bd60d
+  BooleanScott/ tree   b1f293740d1212109683dd7882f7311225cbf5d8
+  mathlib revision     fc4f59e577feb1a4956671bc04ac18aaaf8cd842
+  Lean toolchain       leanprover/lean4:v4.36.0
+
+Reproduction
+  Install Git and elan, clone the repository, and run from its root:
+    lake exe cache get
+    ./scripts/verify.sh
+
+Scope and outcome
+  The run below started in a fresh clone with an empty project build
+  directory. It reused local dependency checkouts and compiled caches.
+  All nine dependency revisions matched the Lake manifest, and their
+  tracked sources were clean. The verifier compiled all 85 project
+  proof modules, audited 955 imported theorem and axiom declarations,
+  and used leanchecker to replay all 85 modules in separate processes.
+
+  The endpoint BooleanScott.pure_boolean_counterexample depends only on
+  propext, Classical.choice, and Quot.sound. In a separate control run,
+  removing Classical.choice from the allowlist made the audit fail.
+  The proof sources, verifier, audit, and build pins in this release
+  match the Git revision tested above. Independent expert review of
+  the correspondence with the original mathematical question is pending.
+
+Accompanying PDFs (SHA-256)
+  f5268ab3c26a40154611afb788242418af4e89e1ea15ca30eed9caacbd4c109a  boolean-scott-spectral-gaps.pdf
+  3c66dcb97f29980117163569585b609e4b5497b9b012933f2dc53a8bf223ba3b  result-in-one-page.pdf
+
+Verifier output
+
+Lean (version 4.36.0, arm64-apple-darwin24.6.0, commit 611c117bfaf7b7ae1cfcf246ce6fba31e8f509e9, Release)
+✔ [6558/6730] Built BooleanScott.StoneModel (3.9s)
+✔ [6560/6730] Built BooleanScott.TagTopology (4.1s)
+✔ [6562/6730] Built BooleanScott.CompactArrays (4.1s)
+✔ [6564/6730] Built BooleanScott.Infinitary (4.3s)
+✔ [6566/6730] Built BooleanScott.Flow (4.3s)
+✔ [6568/6730] Built BooleanScott.PacketTransport (4.2s)
+✔ [6570/6730] Built BooleanScott.Conservation (4.7s)
+✔ [6572/6730] Built BooleanScott.StoneMaps (1.4s)
+✔ [6574/6730] Built BooleanScott.ArrayHomeomorphism (2.5s)
+✔ [6576/6730] Built BooleanScott.RowCounts (2.5s)
+✔ [6578/6730] Built BooleanScott.ClopenCodes (2.5s)
+✔ [6580/6730] Built BooleanScott.CompactDerivatives (2.5s)
+✔ [6582/6730] Built BooleanScott.Presentation (2.4s)
+✔ [6584/6730] Built BooleanScott.StoneAbsorption (1.5s)
+✔ [6586/6730] Built BooleanScott.TupleSystem (2.5s)
+✔ [6588/6730] Built BooleanScott.Diagonal (2.6s)
+✔ [6590/6730] Built BooleanScott.Relativization (2.7s)
+✔ [6592/6730] Built BooleanScott.LedgerArrays (2.1s)
+✔ [6594/6730] Built BooleanScott.ScatteredTowers (2.2s)
+✔ [6596/6730] Built BooleanScott.TreeParameters (2.1s)
+✔ [6598/6730] Built BooleanScott.ClopenSigns (2.2s)
+✔ [6600/6730] Built BooleanScott.Coding (2.2s)
+✔ [6602/6730] Built BooleanScott.FormulaTools (2.1s)
+✔ [6604/6730] Built BooleanScott.MixedPacket (1.8s)
+✔ [6606/6730] Built BooleanScott.AtomlessMatching (2.1s)
+✔ [6608/6730] Built BooleanScott.ClopenIntervals (2.1s)
+✔ [6610/6730] Built BooleanScott.NormalForms (2.1s)
+✔ [6612/6730] Built BooleanScott.Reduction (2.3s)
+✔ [6614/6730] Built BooleanScott.SignTerms (2.3s)
+✔ [6616/6730] Built BooleanScott.CoverComparison (2.2s)
+✔ [6618/6730] Built BooleanScott.PacketAbsorption (2.3s)
+✔ [6620/6730] Built BooleanScott.PacketStone (2.3s)
+✔ [6622/6730] Built BooleanScott.ClopenCounting (2.7s)
+✔ [6624/6730] Built BooleanScott.BooleanTables (2.7s)
+✔ [6626/6730] Built BooleanScott.ScottClauses (2.8s)
+✔ [6628/6730] Built BooleanScott.PacketBasis (1.7s)
+✔ [6630/6730] Built BooleanScott.CantorScott (1.8s)
+✔ [6632/6730] Built BooleanScott.OrbitScott (1.5s)
+✔ [6634/6730] Built BooleanScott.MarkerDerivatives (1.6s)
+✔ [6636/6730] Built BooleanScott.PacketFragments (1.5s)
+✔ [6638/6730] Built BooleanScott.FiniteTypes (1.5s)
+✔ [6640/6730] Built BooleanScott.SpaceTypes (1.5s)
+✔ [6642/6730] Built BooleanScott.TowerFragments (1.4s)
+✔ [6644/6730] Built BooleanScott.LocusCounts (1.5s)
+✔ [6646/6730] Built BooleanScott.PacketClassification (1.4s)
+✔ [6648/6730] Built BooleanScott.FiniteLoci (1.5s)
+✔ [6650/6730] Built BooleanScott.PacketScott (2.0s)
+✔ [6652/6730] Built BooleanScott.PrivateIncidence (2.1s)
+✔ [6654/6730] Built BooleanScott.StoneTests (5.6s)
+✔ [6656/6730] Built BooleanScott.ConcreteRows (5.5s)
+✔ [6658/6730] Built BooleanScott.ConcreteCharts (5.1s)
+✔ [6660/6730] Built BooleanScott.RowRecognition (3.5s)
+✔ [6662/6730] Built BooleanScott.TreeWitness (5.8s)
+✔ [6664/6730] Built BooleanScott.GuardGeometry (3.8s)
+✔ [6666/6730] Built BooleanScott.ChartPresentation (4.0s)
+✔ [6668/6730] Built BooleanScott.GuardAtoms (3.9s)
+✔ [6670/6730] Built BooleanScott.GuardSentence (2.7s)
+✔ [6672/6730] Built BooleanScott.FragmentScott (2.8s)
+✔ [6674/6730] Built BooleanScott.TreeReduction (2.0s)
+✔ [6676/6730] Built BooleanScott.ArrayFragments (2.0s)
+✔ [6678/6730] Built BooleanScott.ChartTypes (1.6s)
+✔ [6680/6730] Built BooleanScott.ChartComparison (2.0s)
+✔ [6682/6730] Built BooleanScott.ChartLedger (1.6s)
+✔ [6684/6730] Built BooleanScott.GuardBorel (1.6s)
+✔ [6686/6730] Built BooleanScott.LedgerBalance (1.7s)
+✔ [6688/6730] Built BooleanScott.RowArrayMatching (1.7s)
+✔ [6690/6730] Built BooleanScott.ArraySlices (1.6s)
+✔ [6692/6730] Built BooleanScott.VertexSectors (1.7s)
+✔ [6694/6730] Built BooleanScott.RowTails (1.9s)
+✔ [6696/6730] Built BooleanScott.ShiftedSectors (1.9s)
+✔ [6698/6730] Built BooleanScott.TagCurrents (1.8s)
+✔ [6700/6730] Built BooleanScott.CrossingCounts (1.5s)
+✔ [6702/6730] Built BooleanScott.ChartTails (1.7s)
+✔ [6704/6730] Built BooleanScott.LooseFragments (1.8s)
+✔ [6706/6730] Built BooleanScott.ChartCoreMatching (1.8s)
+✔ [6708/6730] Built BooleanScott.AbsorptionNecessity (1.9s)
+✔ [6710/6730] Built BooleanScott.CoreAbsorption (1.4s)
+✔ [6712/6730] Built BooleanScott.ChartIsolation (1.5s)
+✔ [6714/6730] Built BooleanScott.RowExchange (1.4s)
+✔ [6716/6730] Built BooleanScott.BranchReserves (1.4s)
+✔ [6718/6730] Built BooleanScott.BranchBlocks (1.5s)
+✔ [6720/6730] Built BooleanScott.BranchSchedule (1.5s)
+✔ [6722/6730] Built BooleanScott.BranchGluing (1.4s)
+✔ [6724/6730] Built BooleanScott.NegativeResolution (1.4s)
+✔ [6726/6730] Built BooleanScott.PureCounterexample (1.4s)
+✔ [6728/6730] Built BooleanScott (1.4s)
+Build completed successfully (6730 jobs).
+'BooleanScott.unitFlow_iff_branch' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.branchless_not_analytic' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.borel_bf' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.clopen_threshold' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.unique_anchor_limit' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.negativeResolution_of_construction' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.clopen_array_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.compactArrayHomeomorph' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.ledgerArrayHomeomorph' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.edge_conservation' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.fragment_markedRows' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.stoneRepresentation' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.stone_secondCountable' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.algebra_absorption_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.borel_presentsBoolean' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.AtLevel.relative' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.relative_models_clopen' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.clopen_tree_membership' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.countable_array_clopens' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.countable_back_and_forth' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.chartScott_of_finite_types' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.second_derivative_formula' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.tower_height' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.mixed_private_mark' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.mixed_open_embedding_index' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.mixed_absorbs_tower' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.mixed_absorbs_cantor' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.repeated_basis' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.clopen_tuple_of_signs' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.mixed_stone' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.cantorScott' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.cantor_nonempty_clopen' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.fragments_repeated' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.spaceType_eq_iff' depends on axioms: [propext, Quot.sound]
+'BooleanScott.mixed_clopen_form' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.towerForm_determined' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.mixed_clopens_determined' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.isolatedClosure_finiteHit' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.signTerm_eval' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.scott_of_finite_counts' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.mixed_finite_scott' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.private_finiteHit' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.row_private_derivative' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.chart_second_tag' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.finite_ledger_rows' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.tagRoot_chart_row' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.finite_roots_outside' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.witness_stone' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.witness_named_anchors' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.witness_guard' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.GuardData.vertex_limit' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.GuardData.near_limit_reserve' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.finiteAnchors_test' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.guardClauses_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.guardSentence' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.negativeResolution_of_tree_geometry' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.diagramBF_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.measurable_diagramBF' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.chartRestrict_surjective' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.chartDiagram_measurable' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.codedChartMatch_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.geometric_borel_of_chart_isolation' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.negativeResolution_of_chart_isolation_and_absorption' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'BooleanScott.finiteIso_add' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.array_fragment_away' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.chart_root_free_comparison' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.chart_ledger_count' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.chart_fragment_ledger' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.row_clopen_balance' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.chart_clopen_balance' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.disjoint_vertex_sectors' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.TagCurrents.hasBranch' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.fixes_guard_vertex' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.shifted_sector' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.crossing_balance' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.image_exterior' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.guarded_absorption_implies_branch' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.negativeResolution_of_chart_isolation_and_branch_realization' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'BooleanScott.match_row_arrays' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.slice_type' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.rowTail_type' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.chart_tail_spec' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.ChartTailSpec.core_type' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.retained_equiv' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.ChartTailSpec.core_matches' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.ChartTailSpec.remainder' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.row_absorbs_tag' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.ChartTailSpec.core_absorbs_pure' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.rooted_chart_comparison' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.vertex_chart_scott' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.chart_isolation' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.negativeResolution_of_branch_realization' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.vertex_row_exchange' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.row_prefix' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.GuardData.reserve_prefix' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.GuardData.allocate_block' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.GuardData.convergent_blocks' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.block_sum_absorption' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.ray_absorption' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.guarded_branch_implies_absorption' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.guarded_absorption_iff_branch' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.negativeResolution' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.booleanLawSentence_models' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.rankAtMost_of_operationRank' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.trivial_rankAtMost' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BooleanScott.pure_boolean_counterexample' depends on axioms: [propext, Classical.choice, Quot.sound]
+Axiom audit passed for 955 imported project theorem and axiom declarations.
+Kernel replay passed: BooleanScott.AbsorptionNecessity
+Kernel replay passed: BooleanScott.ArrayFragments
+Kernel replay passed: BooleanScott.ArrayHomeomorphism
+Kernel replay passed: BooleanScott.ArraySlices
+Kernel replay passed: BooleanScott.AtomlessMatching
+Kernel replay passed: BooleanScott.BooleanTables
+Kernel replay passed: BooleanScott.BranchBlocks
+Kernel replay passed: BooleanScott.BranchGluing
+Kernel replay passed: BooleanScott.BranchReserves
+Kernel replay passed: BooleanScott.BranchSchedule
+Kernel replay passed: BooleanScott.CantorScott
+Kernel replay passed: BooleanScott.ChartComparison
+Kernel replay passed: BooleanScott.ChartCoreMatching
+Kernel replay passed: BooleanScott.ChartIsolation
+Kernel replay passed: BooleanScott.ChartLedger
+Kernel replay passed: BooleanScott.ChartPresentation
+Kernel replay passed: BooleanScott.ChartTails
+Kernel replay passed: BooleanScott.ChartTypes
+Kernel replay passed: BooleanScott.ClopenCodes
+Kernel replay passed: BooleanScott.ClopenCounting
+Kernel replay passed: BooleanScott.ClopenIntervals
+Kernel replay passed: BooleanScott.ClopenSigns
+Kernel replay passed: BooleanScott.Coding
+Kernel replay passed: BooleanScott.CompactArrays
+Kernel replay passed: BooleanScott.CompactDerivatives
+Kernel replay passed: BooleanScott.ConcreteCharts
+Kernel replay passed: BooleanScott.ConcreteRows
+Kernel replay passed: BooleanScott.Conservation
+Kernel replay passed: BooleanScott.CoreAbsorption
+Kernel replay passed: BooleanScott.CoverComparison
+Kernel replay passed: BooleanScott.CrossingCounts
+Kernel replay passed: BooleanScott.Diagonal
+Kernel replay passed: BooleanScott.FiniteLoci
+Kernel replay passed: BooleanScott.FiniteTypes
+Kernel replay passed: BooleanScott.Flow
+Kernel replay passed: BooleanScott.FormulaTools
+Kernel replay passed: BooleanScott.FragmentScott
+Kernel replay passed: BooleanScott.GuardAtoms
+Kernel replay passed: BooleanScott.GuardBorel
+Kernel replay passed: BooleanScott.GuardGeometry
+Kernel replay passed: BooleanScott.GuardSentence
+Kernel replay passed: BooleanScott.Infinitary
+Kernel replay passed: BooleanScott.LedgerArrays
+Kernel replay passed: BooleanScott.LedgerBalance
+Kernel replay passed: BooleanScott.LocusCounts
+Kernel replay passed: BooleanScott.LooseFragments
+Kernel replay passed: BooleanScott.MarkerDerivatives
+Kernel replay passed: BooleanScott.MixedPacket
+Kernel replay passed: BooleanScott.NegativeResolution
+Kernel replay passed: BooleanScott.NormalForms
+Kernel replay passed: BooleanScott.OrbitScott
+Kernel replay passed: BooleanScott.PacketAbsorption
+Kernel replay passed: BooleanScott.PacketBasis
+Kernel replay passed: BooleanScott.PacketClassification
+Kernel replay passed: BooleanScott.PacketFragments
+Kernel replay passed: BooleanScott.PacketScott
+Kernel replay passed: BooleanScott.PacketStone
+Kernel replay passed: BooleanScott.PacketTransport
+Kernel replay passed: BooleanScott.Presentation
+Kernel replay passed: BooleanScott.PrivateIncidence
+Kernel replay passed: BooleanScott.PureCounterexample
+Kernel replay passed: BooleanScott.Reduction
+Kernel replay passed: BooleanScott.Relativization
+Kernel replay passed: BooleanScott.RowArrayMatching
+Kernel replay passed: BooleanScott.RowCounts
+Kernel replay passed: BooleanScott.RowExchange
+Kernel replay passed: BooleanScott.RowRecognition
+Kernel replay passed: BooleanScott.RowTails
+Kernel replay passed: BooleanScott.ScatteredTowers
+Kernel replay passed: BooleanScott.ScottClauses
+Kernel replay passed: BooleanScott.ShiftedSectors
+Kernel replay passed: BooleanScott.SignTerms
+Kernel replay passed: BooleanScott.SpaceTypes
+Kernel replay passed: BooleanScott.StoneAbsorption
+Kernel replay passed: BooleanScott.StoneMaps
+Kernel replay passed: BooleanScott.StoneModel
+Kernel replay passed: BooleanScott.StoneTests
+Kernel replay passed: BooleanScott.TagCurrents
+Kernel replay passed: BooleanScott.TagTopology
+Kernel replay passed: BooleanScott.TowerFragments
+Kernel replay passed: BooleanScott.TreeParameters
+Kernel replay passed: BooleanScott.TreeReduction
+Kernel replay passed: BooleanScott.TreeWitness
+Kernel replay passed: BooleanScott.TupleSystem
+Kernel replay passed: BooleanScott.VertexSectors
+Kernel replay passed: 85 proof modules.
