@@ -11,7 +11,7 @@ Gonzalez and Harrison-Trainor asked whether fixing the complexity of a sentence 
 | Start here | What to look for |
 | --- | --- |
 | [Formal theorem](BooleanScott/PureCounterexample.lean#L61) | `BooleanScott.pure_boolean_counterexample` states the exact quantifiers. Its sentence entails the Boolean equations and $0\ne 1$, has a countable Boolean model, and excludes a $\Pi_{b+1}$ Scott sentence for every countable model among all countable structures of the signature. |
-| [Manuscript source](paper/boolean-scott-spectral-gaps.tex) | A four-page proof overview, from the tree construction through the rank lower bound. The draft release includes the typeset PDF. |
+| [Manuscript source](paper/boolean-scott-spectral-gaps.tex) | The full proof, including the finite-degree markers, the chart Scott bound, both directions of the absorption theorem in arbitrary models, and the Borel argument. The private draft release includes the typeset PDF. |
 | [Guide to the formal proof](PROOF_GUIDE.md) | A module-by-module account of the arguments, including where finiteness, countability and the quantifier over all models enter. |
 | [Rank and syntax](BooleanScott/Infinitary.lean) | The pure Boolean language, infinitary hierarchy and definition of the comparison with $b$. |
 | [Absorption and the Boolean-algebra theorem](BooleanScott/NegativeResolution.lean) | `BooleanScott.guarded_absorption_iff_branch` and `BooleanScott.negativeResolution` discharge the geometric hypotheses. |
@@ -37,7 +37,7 @@ printf '%s\n' 'import BooleanScott' \
   '#print axioms BooleanScott.pure_boolean_counterexample' | lake env lean --stdin
 ```
 
-To typeset the overview, run `mkdir -p dist` followed by `latexmk -pdf -outdir=dist paper/boolean-scott-spectral-gaps.tex` from the repository root.
+To typeset the manuscript, run `mkdir -p dist` followed by `latexmk -pdf -outdir=dist paper/boolean-scott-spectral-gaps.tex` from the repository root.
 
 ## Contributions and review
 

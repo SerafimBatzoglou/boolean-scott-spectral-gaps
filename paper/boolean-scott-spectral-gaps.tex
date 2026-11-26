@@ -1,236 +1,1079 @@
 \documentclass[11pt,letterpaper]{article}
 \usepackage[T1]{fontenc}
-\usepackage{lmodern,microtype,amsmath,amssymb,amsthm}
+\usepackage{lmodern,microtype,amsmath,amssymb,amsthm,booktabs,tabularx}
 \usepackage[margin=1.05in]{geometry}
 \usepackage{xcolor}
-\usepackage[pdfusetitle,colorlinks=true,linkcolor=black,urlcolor=blue!55!black,citecolor=black,pdftitle={Unbounded minimum Scott ranks for Boolean algebras}]{hyperref}
-\newtheorem{theorem}{Theorem}
-\newtheorem*{criterion}{Absorption criterion}
+\definecolor{inkblue}{RGB}{22,63,97}
+\usepackage[pdfusetitle,colorlinks=true,linkcolor=inkblue,urlcolor=inkblue,citecolor=inkblue,
+pdftitle={Unbounded minimum Scott ranks for Boolean algebras}]{hyperref}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}\newtheorem{definition}[theorem]{Definition}
 \newcommand{\N}{\mathbb N}
+\newcommand{\Baire}{\mathcal N}
+\newcommand{\BA}{\mathsf{BA}}
 \newcommand{\Clop}{\operatorname{Clop}}
+\newcommand{\SR}{\operatorname{SR}}
+\newcommand{\Hit}{\operatorname{Hit}}
+\newcommand{\rk}{\operatorname{rk}}
+\newcommand{\id}{\mathrm{id}}
+\newcommand{\card}[1]{\lvert #1\rvert}
+\newcommand{\res}{\mathbin{\upharpoonright}}
 \newcommand{\code}[2]{\href{https://github.com/SerafimBatzoglou/boolean-scott-spectral-gaps/blob/e1b9ab53208242a9da1efc2336e61db9c1a5566c/BooleanScott/#1.lean}{#2}}
+\setcounter{tocdepth}{1}
 \title{Unbounded minimum Scott ranks\\for Boolean algebras}
 \author{GPT 6.2 Astra (Codex) with Serafim Batzoglou}
-\date{Proof overview for private review\\November 26, 2026}
+\date{Private review manuscript\\November 26, 2026}
 \begin{document}
 \maketitle
 \begin{abstract}
-For every countable ordinal \(b\), there is a satisfiable pure Boolean
-\(\Pi_{\omega+4}\) sentence whose countable models all have Scott rank greater
-than \(b\). This gives a negative answer to the existence question of Gonzalez
-and Harrison-Trainor at one fixed input complexity. We describe how a tree
-controls absorption of a fixed Boolean factor in every model of a sentence,
-and how a descriptive-set-theoretic argument turns that criterion into a
-lower bound on the least model rank. The accompanying Lean formalization
-includes the infinitary syntax, the topological construction and the final
-passage to arbitrary structures in the Boolean signature.
+For every countable ordinal \(b\) we construct, by an existence argument, a satisfiable
+pure Boolean \(\Pi_{\omega+4}\) sentence none of whose countable models admits a
+\(\Pi_{b+1}\) Scott sentence. This answers the existence part of Question~1.9
+of Gonzalez and Harrison-Trainor negatively at a fixed input complexity.
+We build a countable Boolean algebra \(B\) and associate a sentence to each tree
+on \(\mathbb N\). Every countable model \(A\) of that sentence satisfies
+\(A\cong A\times B\) exactly when the tree has an infinite branch. The
+criterion follows from finite counts in clopen sets on the Stone side and a
+homeomorphism constructed along a branch. Projecting a Borel set of operation
+tables then gives the lower bound simultaneously for all models of one sentence.
 \end{abstract}
+\tableofcontents
+\clearpage
 
-\section{The question and the rank convention}
-A Scott sentence for a countable structure \(A\) is a sentence of
-\(L_{\omega_1\omega}\) whose countable models are precisely the isomorphic
-copies of \(A\). We use the parameterless convention of
-Gonzalez and Harrison-Trainor~\cite{ght}. The rank of \(A\) is at most \(b\)
-if it admits a \(\Pi_{b+1}\) Scott sentence. Question~1.9 of their paper asks
-whether fixing the complexity of a satisfiable sentence extending Boolean
-algebra theory bounds the least Scott rank among its models.
-\begin{theorem}\label{thm}
-For each \(b<\omega_1\) there exists a \(\Pi_{\omega+4}\) sentence
-\(\varphi_b\) in the signature \(0,1,\neg,\wedge,\vee\) such that
+\section{The minimum of a Scott spectrum}\label{sec:intro}
+Scott's isomorphism theorem gives every countable structure \(A\) a sentence of
+\(L_{\omega_1\omega}\) whose countable models are precisely its isomorphic
+copies~\cite{scott}. The complexity of the simplest such description measures
+how difficult it is to distinguish \(A\) from the other countable structures.
+A different question arises when we specify a \emph{class} of structures.
+How difficult must it be to describe its simplest member?
+
+We use the parameterless Scott rank of Montalb\'an~\cite{montalban} in its
+Scott-sentence formulation. Thus \(\SR(A)\) is the least ordinal \(b\) for
+which \(A\) has a \(\Pi_{b+1}\) Scott sentence. The Scott spectrum of a sentence
+is the set of these ranks for its countable models. Without a restriction on
+the class of structures, Harrison-Trainor showed that a satisfiable
+\(\Pi_2\) sentence can have arbitrarily high minimum rank~\cite{ht}.
+For linear orders, Gonzalez and Harrison-Trainor proved that every satisfiable
+\(\Pi_\alpha\) input extending the linear-order axioms has a model with a
+\(\Pi_{\alpha+4}\) Scott sentence~\cite[Theorem~1.5]{ght}.
+They ask whether any bound depending on \(\alpha\) exists for Boolean
+algebras~\cite[Question~1.9]{ght}. The question concerns the minimum of the
+spectrum. Exhibiting one complicated Boolean algebra cannot answer it.
+
+\begin{theorem}\label{thm:main}
+For each countable ordinal \(b\) there is a sentence \(\varphi_b\) in the
+signature \(0,1,\neg,\wedge,\vee\), with equality, such that
 \begin{enumerate}
-\item every structure satisfying \(\varphi_b\) obeys the Boolean algebra
-equations and has \(0\ne1\),
-\item some countable Boolean algebra satisfies \(\varphi_b\), and
-\item no countable model of \(\varphi_b\) admits a \(\Pi_{b+1}\) Scott
-sentence among all countable structures in this signature.
+\item \(\varphi_b\) is \(\Pi_{\omega+4}\), and every structure satisfying it
+is a Boolean algebra with \(0\ne1\);
+\item \(\varphi_b\) has a countable Boolean model;
+\item for every countable \(A\models\varphi_b\), no \(\Pi_{b+1}\) sentence
+isolates \(A\) up to isomorphism among all countable structures in this signature.
 \end{enumerate}
 \end{theorem}
-The sentence can vary with \(b\). Its complexity has the same upper bound in
-every case. The theorem leaves open whether failure first occurs at a lower
-level. The \code{PureCounterexample}{final Lean declaration} gives these
-three clauses in this order.
+In particular, the set of minima of Scott spectra of these satisfiable inputs
+is unbounded in \(\omega_1\). The witness sentence depends on \(b\). Our
+argument gives an upper bound on its syntactic complexity and leaves the first
+possible level of failure undetermined.
 
-\section{A fixed factor and a family of sentences}
-Work first with countable Boolean algebras. By Stone duality an algebra \(A\)
-is the algebra of clopens of a compact zero-dimensional Hausdorff space \(X\).
-A product of two algebras corresponds to a disjoint union of their spaces.
-Write \(X\sqcup R\cong X\) when \(X\) absorbs a particular compact space \(R\).
-The construction supplies this fixed \(R\), and for trees
-\(T\subseteq\N^{<\omega}\) a pure \(\Pi_{\omega+4}\) sentence \(\Psi_T\)
-called the guard. Each guard has a countable Boolean model. Its clauses force
-the following statement throughout its countable model class.
-\begin{criterion}
-If \(\Clop(X)\models\Psi_T\), then \(X\sqcup R\cong X\) if and only if
-\(T\) has an infinite branch.
-\end{criterion}
-The universal quantifier over models is essential. A construction specifying
-just one space of high rank per tree would leave the least rank of a model
-undetermined. We first explain the geometry that gives this quantifier
-and then apply the criterion to prove the theorem.
+\subsection*{Why use a product?}
+If a structure agrees with a nonisomorphic structure on every
+\(\Pi_{b+1}\) sentence, its rank exceeds \(b\). We arrange that a comparison
+structure is always available: it is the product \(A\times B\) with a
+\emph{fixed} Boolean algebra \(B\). The product corresponds under Stone
+duality to adjoining a fixed disjoint summand \(R\). Absorption of summands
+is a delicate invariant of countable Boolean algebras. For linear orders,
+the existence in \(M\) of initial segments of type \(L\cdot n\) for all
+finite \(n\) forces \(L+M\cong M\). Gonzalez and Harrison-Trainor
+explain how Ketonen's work on Boolean algebras~\cite{ketonen} precludes
+the analogous inference there~\cite[\S1]{ght}. We use this flexibility
+to encode the existence of an infinite branch.
 
-\subsection*{Recognizable pieces}
-For locally compact \(Y\), write \(Y^+\) for its one-point compactification.
-Set \(T_0=\{*\}\) and let \(T_{d+1}\) be the compactified disjoint union of
-countably many copies of \(T_d\). Let \(G_d\) be the compactified disjoint
-union of countably many copies of \(2^{\N}\sqcup T_d\), where \(2^{\N}\)
-is Cantor space. One can read \(d\) at the added point using only clopens.
-Indeed, let \(D\) be the closure of the isolated points, and define
+The proof has two distinct quantifiers to control. First we construct a
+sentence \(\Psi_T\) for each tree \(T\), with an explicit countable witness,
+and prove
+\begin{equation}\label{eq:criterion}
+ \text{for every countable Boolean } A\models\Psi_T,\qquad
+ A\cong A\times B\quad\Longleftrightarrow\quad T\text{ has a branch}.
+\end{equation}
+The sentence prescribes small clopen neighborhoods of certain points of the
+Stone space. It allows additional points elsewhere. Sections~\ref{sec:guard}
+and~\ref{sec:absorb} explain why such points cannot invalidate either
+direction of~\eqref{eq:criterion}. Second, for a given \(b\), we must find
+one branchless \(T\) for which \emph{every} model agrees with its product
+through level \(b+1\). The existence of even one model that fails this
+comparison is an analytic condition on \(T\). The branchless parameters form
+a nonanalytic set. Section~\ref{sec:diagonal} uses this discrepancy to choose \(T\).
+
+\section{Logic and topology used in the construction}\label{sec:tools}
+Write \(\N=\omega=\{0,1,\ldots\}\), and take all ordinal bounds below the first
+uncountable ordinal \(\omega_1\). Countable includes finite.
+The language \(L_{\omega_1\omega}\) allows countable conjunctions and
+disjunctions and finite strings of quantifiers, with finitely many free
+variables per formula. We use the usual noneffective infinitary hierarchy.
+At level zero take finitary quantifier-free formulas. For \(\alpha>0\),
+the two forms are
 \[
- M_j(X)=D\cap\overline{X\setminus D}\cap
-            \bigl(D^{(j+1)}\setminus D^{(j+2)}\bigr),
+ \Sigma_\alpha:\ \bigvee_i\exists\bar u_i\,\theta_i,\quad
+       \theta_i\in\Pi_{\beta_i};
+ \qquad
+ \Pi_\alpha:\ \bigwedge_i\forall\bar u_i\,\eta_i,\quad
+       \eta_i\in\Sigma_{\beta_i},\qquad \beta_i<\alpha.
 \]
-where superscripts denote iterated derived sets. In \(G_d\) the Cantor
-pieces miss \(D\), and the towers lie in \(D\). Only the added point is
-approached by both sides. It belongs to \(D^{(d+1)}\) and drops out at
-the next derivative. Consequently \(M_j(G_d)\) consists of the added
-point if \(j=d\), and is empty otherwise. The test restricts to open
-subspaces. For each fixed \(j\), incidence of a clopen with \(M_j\) is
-expressible at a finite level of the pure Boolean hierarchy.
+The index sets are countable, the blocks finite (possibly empty), and a
+quantifier-free formula is available at every level. Negation exchanges the
+two forms. At a positive level one may flatten countable conjunctions of
+\(\Pi\)-formulas, or countable disjunctions of \(\Sigma\)-formulas, at that
+same level. Finite Boolean combinations of finite-level formulas have finite
+level. A countable collection of tests, each at some finite level, can be
+conjoined at \(\Pi_\omega\) by first putting each at a finite \(\Sigma\)
+level. A \emph{finite-level} test can itself be infinitary.
 
-A row \(R_{e,n}\) is the compactified sum of one \(G_{2j}\) for every
-\(j\ge n\) and infinitely many copies of \(G_{2e+1}\). The index \(e\)
-labels the row, while \(n\) specifies its first even column. For a nonempty
-set \(S\subseteq\N\), a chart \(C_S\) compactifies the sum of the rows
-\(R_{e,e+k}\), for \(e\in S\) and \(k\in\N\). Call its added point the
-vertex. In a chart the first derivative of the \(M_{2e+1}\) points picks
-out the roots of rows labeled \(e\) together with the vertex when \(e\in S\).
-Its second derivative consists of that vertex when \(e\in S\) and is empty
-otherwise. In column \(j\), only rows with \(e+k\le j\) can contribute.
-Every individual even column is therefore finite, even for infinite \(S\).
+A Boolean algebra is a bounded distributive lattice in which every element
+\(a\) has a complement \(\neg a\), characterized by \(a\wedge\neg a=0\)
+and \(a\vee\neg a=1\). The order is \(a\le b\) iff \(a\wedge b=a\).
+A filter is an upward-closed set containing \(1\) and closed under finite
+meets; an ultrafilter is a maximal filter omitting \(0\). It picks exactly
+one of \(a,\neg a\) for each \(a\).
 
-\subsection*{How the tree enters the guard}
-Give every potential vertex its own private label, and each possible
-parent--child edge a separate label. The chart at \(v\) carries its private
-label and the labels of incident retained edges. An edge is retained when
-its child belongs to \(T\). The fixed summand \(R\) is the cutoff-zero
-row with the private label of the empty sequence. Use second derivatives
-of odd markers to identify each private vertex and to confine each retained
-edge's possible accumulation points to its endpoints. Require a clopen
-chart of the prescribed type around each vertex. Finally require that the
-set of vertices in any clopen be finite or cofinite and that each clopen
-containing infinitely many vertices contain a whole copy of \(G_{2j}\)
-for each \(j\). A witness is the compactified sum of all prescribed charts
-and infinitely many extra copies of each even packet. Its clopen algebra
-is countable. In any guarded space the vertices have a unique accumulation
-point \(t\). Two such points would give a clopen separating two infinite
-sets of vertices, and a vertex itself has a chart excluding all other vertices.
-
-Here the syntactic cost of specifying a chart matters. On each Boolean sign
-region of a tuple, equality of finite types gives the vertex bit, the counts
-of retained row roots of each label, and the marker counts in every column.
-Cut sufficiently far along the even columns of the retained rows. Only
-finitely many cutoffs lie below the cut. The retained arrays pair
-label-by-label, and eligible slots in each late column pair by finite
-bijections. These bijections can eventually preserve any fixed paired row
-in both directions, giving continuity at its root. The remaining finite
-pieces are classified by the mixed-packet counts and the heights of the
-residual towers. A retained row absorbs any bounded pure remainder and any
-finite number of its own repeated odd packet. In a sign region containing
-no row or vertex, a finite-level Scott test determines the whole region.
-The resulting homeomorphisms glue across signs, so all finite tests
-together determine tuple orbits. Each orbit in the countable chart has a
-\(\Pi_\omega\) definition by separating a representative from the countably
-many tuples outside its orbit. The extension clauses for these orbits give a
-\(\Pi_{\omega+2}\) Scott sentence. Relativizing to a principal interval
-preserves its complexity. Choosing a chart and imposing the requirements
-for every vertex yields the \(\Pi_{\omega+4}\) guard. See
-\code{ChartIsolation}{chart isolation} and \code{GuardSentence}{guard syntax}.
-
-\section{Why absorption detects exactly the branches}
-Suppose first that \(h:X\sqcup R\longrightarrow X\) is a homeomorphism.
-Choose disjoint clopen sectors about the vertices within their charts.
-Include \(R\) in the source root sector. Each private marker forces \(h\)
-to take its vertex to the same vertex. At \(v\), compare the image sector
-and the target sector. Their two differences are clopen and miss the vertex.
-Such a fragment has only finitely many retained row roots, and its marker
-count in every sufficiently late even column equals the total number of
-these roots. This follows by looking in the finitely many rows it meets
-and using convergence to each row root.
-
-Subtract the two finite counts for each row label, taking image minus
-target. The signed vector at \(v\) has finite support. In a late even column
-one can cancel the common intersection because the column count is finite.
-The sum of the signed coordinates is thus one at the root and zero at every
-other vertex. For a private label, the complement of its sector has finitely
-many roots of that label. Comparing the complementary counts forces the
-private coordinate to vanish. For an edge label, make the same comparison
-outside the \emph{union} of the two endpoint sectors. Its two signed
-coordinates sum to zero. This gives a locally finitely supported integer
-flow. The root has a positive outgoing coordinate. On following it, the
-parent coordinate at the next vertex is negative, so some child coordinate
-is again positive. Iteration produces a branch even at vertices of infinite
-degree. The cancellation and the iteration are proved in
-\code{AbsorptionNecessity}{absorption necessity} and
-\code{TagCurrents}{signed currents}.
-
-Conversely, take an infinite branch. At each of its vertices remove a row
-of the outgoing edge label from a clopen chart neighborhood, leaving a
-clopen base containing the vertex. The removed row may start at column
-\(n>0\). The reserve near \(t\) supplies one packet in each missing column
-\(j<n\), giving the type of a cutoff-zero row. With a base containing the
-vertex, two added cutoff-zero rows of different allowed labels can be
-exchanged: each affected label already occurs infinitely often, and the
-extra row contributes equally to each finite even column. The protected
-row pairing described above realizes this exchange by a homeomorphism.
-
-Choose disjoint sites consisting of the bases and their completed rows.
-Their convergence to \(t\) is needed for continuity. Enumerate the clopens
-and, at stage \(n\), choose the site within windows about the current vertex
-and \(t\) respecting the first \(n\) clopens and avoiding earlier sites.
-Distinct branch vertices converge to \(t\) by the finite-or-cofinite
-condition. Thus every neighborhood of \(t\) eventually contains the entire
-sites. Shift the rows one step along the branch, inserting \(R\) at the
-root. The local exchanges identify the new pieces with the old ones.
-The maps glue, fixing \(t\) and the exterior of the sites. This proves the
-criterion. See \code{BranchSchedule}{choice of sites} and
-\code{NegativeResolution}{the assembled equivalence}.
-
-\section{From all-model absorption to unbounded minimum rank}
-Fix \(b<\omega_1\). The formal proof uses a Baire-parameterized family
-\(T_c\) of trees with nonanalytic branchless set \(W\). For orientation,
-there is a universal family of sections whose branch parameters represent
-the ranges of continuous maps on Baire space. Taking the diagonal section
-gives \(T_c\). If \(W\) were analytic, its nonemptiness would give such a
-continuous parametrization. Substituting its own section code yields
-\(c\in W\) if and only if \(T_c\) has a branch.
-This is the diagonal contradiction in \code{Diagonal}{the tree construction}.
-
-Let \(B=\Clop(R)\). On operation tables for countably infinite algebras,
-write \(A\equiv_\gamma A'\) for the symmetric finite-block back-and-forth
-relation at the empty tuple. Isomorphism implies this relation at every
-countable level, and at level \(\gamma\) it transfers truth of
-\(\Pi_\gamma\) sentences. At a fixed countable level it is Borel in the
-tables, by recursion over smaller levels and quantification over finite
-tuples from countable sets. The guard relation is jointly Borel in the tree
-parameter and the table. In particular, testing for a prescribed chart can
-be done by Borel comparison with a presented chart of the known Scott
-bound. This avoids having to choose Scott sentences uniformly in \(c\).
-It follows that the following projection is analytic:
+A \emph{Stone space} is a compact Hausdorff space with a basis of sets
+that are both open and closed (clopens). Its clopens form a Boolean algebra
+\(\Clop(X)\) under the set operations. Conversely the ultrafilters of a
+Boolean algebra \(A\), with basic clopens \(\widehat a=\{p:a\in p\}\), form
+its Stone space. The map \(a\mapsto\widehat a\) is an isomorphism:
+ultrafilters separate distinct elements, and compactness turns a covering of
+a clopen by basic clopens into a finite union. Stone duality~\cite{stone}
+identifies isomorphisms of these algebras with homeomorphisms of their
+spaces. In particular,
 \[
- P_b=\{c:\exists A\ [\,A\text{ is a Boolean table satisfying }\Psi_{T_c}
-                 \ \land\ A\not\equiv_{b+1} A\times B\,]\}.
+ \Clop(X\sqcup Y)\cong\Clop(X)\times\Clop(Y),\qquad
+ \Clop(C)\cong[0,C]\subseteq\Clop(X)\quad(C\text{ clopen}).
 \]
-If \(T_c\) has a branch, every guarded algebra is isomorphic to its product
-with \(B\). Thus \(P_b\subseteq W\). Since \(W\) is nonanalytic, choose
-\(c\in W\setminus P_b\). The guard for this \(c\) has a countable model.
-Every countable guarded algebra is infinite because the distinct private
-vertices require an infinite Stone space. It therefore has a presentation
-among the tables just considered. Each such algebra \(A\) satisfies
-\(A\equiv_{b+1} A\times B\), while the absence of a branch implies
-\(A\not\cong A\times B\). A \(\Pi_{b+1}\) Scott sentence for \(A\) would
-transfer to the countable product and would force an isomorphism. This rules
-out such a sentence for every countable guarded algebra.
+The latter interval has top \(C\) and complement \(x\mapsto C\setminus x\).
+Any formula about the interval can be translated to one about the ambient
+algebra with the additional parameter \(C\), at the same level. Replace
+variables by \(x\wedge C\), top by \(C\), and complements by relative
+complements. Every interval assignment lifts to an ambient assignment,
+so induction through either kind of quantifier block proves preservation
+of truth. This also covers \(C=\varnothing\).
+We use Stone spaces with countably many clopens throughout the construction.
+They have countable bases, although their sets of points can be uncountable.
 
-Finally conjoin the universal Boolean equations to the guard at the same
-positive \(\Pi\) level. Any satisfying operation structure now carries
-a Boolean algebra with exactly its given operations. The one-element
-algebra is already isolated among Boolean algebras by \(0=1\), hence cannot
-satisfy the guard. A Scott sentence isolating a countable model among all
-operation structures also isolates it among Boolean algebras, since an
-operation isomorphism preserves and reflects the order. This proves
-Theorem~\ref{thm}. The exact implications are in
-\code{Reduction}{the projection argument} and
-\code{PureCounterexample}{the raw-signature theorem}.
+For compact Stone spaces \(X_i\), put
+\[
+ \mathcal K(X_i:i\in I)=\{\infty\}\ \cup\ \coprod_{i\in I}X_i .
+\]
+Give the disjoint union its sum topology and \(\infty\) the neighborhoods
+of the one-point compactification. The components are clopen. Neighborhoods
+of \(\infty\) contain every whole component outside some finite set:
+a compact subset of a sum meets only finitely many components. Conversely
+the complements of finite unions of whole components form a neighborhood
+basis there. Hence a clopen of \(\mathcal K\) is specified by its membership
+bit at \(\infty\), and by a clopen in each component agreeing with that
+bit (whole or empty) outside finitely many indices. These data also prove
+compactness, zero-dimensionality and countability of the clopen algebra
+when \(I\) and each \(\Clop(X_i)\) are countable. We call the added point
+the \emph{apex}. For a set \(P\subseteq X\), its derivative \(P'\) is
+the set of all points every neighborhood of which meets \(P\) in a point
+other than itself. Set \(P^{(0)}=P\), \(P^{(k+1)}=(P^{(k)})'\).
+At an apex, belonging to \(P'\) is exactly the condition that \(P\)
+meets infinitely many components.
+
+\subsection*{Translating incidence into Boolean formulas}
+Our point sets will be intrinsic: restricting the ambient space to an open
+subspace restricts the point set by intersection. Isolated points, closure,
+derivative, and the set operations used below all have this locality.
+For such a set \(P\), write \(\Hit_P(C)\) for \(C\cap P\ne\varnothing\).
+We need tests using quantified \emph{clopens}; the language has no point
+variables.
+
+\begin{lemma}\label{lem:hit}
+Suppose \(\Hit_P\) has a finite-level Boolean test on clopens.
+For every \(h<\omega\), the condition \(\card{C\cap P}\ge h\) has a
+finite-level test whose level is bounded independently of \(h\).
+Incidence with \(\overline P\) and with \(P'\) also has a finite-level
+test. Given finite-level incidence tests for \(P,Q\), one can test
+\(P\setminus Q\) if \(Q\) is closed, and \(P\cap Q\) if both are closed.
+\end{lemma}
+\begin{proof}
+For \(h>0\), ask for \(h\) pairwise disjoint clopens below \(C\), each
+meeting \(P\). Distinct points in \(C\) can be separated by such clopens:
+take a finite clopen partition distinguishing the chosen points. The
+converse uses disjointness; \(h=0\) is a tautology. There is one finite
+existential block regardless of \(h\), and the finitely many incidence
+tests in its matrix can all be put at one common positive \(\Pi\) level.
+Thus the bound is uniform. Incidence with \(\overline P\) equals incidence
+with \(P\) since \(C\) is open. A clopen meets \(P'\) exactly when it
+contains infinitely many points of \(P\). One direction follows by separating
+finitely many points in a Hausdorff space; the other uses compactness of
+\(C\). Conjoin all the threshold tests at one further finite level.
+
+To test \(P\setminus Q\), ask for a subclopen meeting \(P\) and missing
+\(Q\). Closedness gives such a neighborhood of any witness. Finally
+\(C\cap P\cap Q\) is empty exactly when some clopen \(U\) contains
+\(C\cap P\) and misses \(C\cap Q\). For disjoint compact closed sets this
+follows by covering the first with finitely many clopens disjoint from
+the second. The condition can be written
+\(\neg\Hit_P(C\setminus U)\wedge\neg\Hit_Q(C\cap U)\).
+All quantification is over elements of \(\Clop(X)\).
+\end{proof}
+
+\subsection*{From tuple orbits to a Scott sentence}
+An orbit of a finite tuple consists of its images under all automorphisms.
+For \(\bar a=(a_1,\dots,a_m)\) of clopens, its \emph{sign cells} are the
+\(2^m\) intersections obtained by taking either \(a_i\) or its complement
+at each position. Empty cells are allowed. The nonempty cells partition
+\(X\), and a homeomorphism on each pair of corresponding cells glues to a
+homeomorphism taking \(\bar a\) to \(\bar b\). Each cell is given by a
+Boolean term, so every finite-level test on one cell gives a finite-level
+test on the tuple by substitution. For \(m=0\) the only cell is \(X\).
+
+\begin{lemma}\label{lem:orbits}
+Let \(A\) be a countable Boolean algebra. Suppose that for each finite
+tuple \(\bar a\) of \(A\) there is a \(\Pi_\lambda\) formula \(D_{\bar a}\)
+defining its orbit \emph{in \(A\)}. Then \(A\) has a \(\Pi_{\lambda+2}\)
+Scott sentence among countable Boolean algebras. In particular, if agreement
+on all finite-level formulas implies that two tuples in \(A\) are
+automorphic, \(A\) has a \(\Pi_{\omega+2}\) Scott sentence.
+\end{lemma}
+\begin{proof}
+Require \(D_\varnothing\). For every \(\bar a\), require that any tuple
+\(\bar x\) satisfying \(D_{\bar a}\) have the same order relations between
+its entries as \(\bar a\). Add the following two extension clauses:
+\[
+\begin{aligned}
+ &\forall\bar x\bigl(D_{\bar a}(\bar x)\ \longrightarrow\
+        \exists y\,D_{\bar a a}(\bar x,y)\bigr) &&(a\in A),\\
+ &\forall\bar x\,y\bigl(D_{\bar a}(\bar x)\ \longrightarrow\
+        \bigvee_{a\in A} D_{\bar a a}(\bar x,y)\bigr).
+\end{aligned}
+\]
+The bodies of the universal clauses are \(\Sigma_{\lambda+1}\):
+negate the antecedent and take a disjunction. Countability of the tuples
+and one outer universal block give \(\Pi_{\lambda+2}\). In \(A\) an
+automorphism witnessing \(D_{\bar a}\), or its inverse, supplies the
+extensions. In a countable model, enumerate both algebras and extend a
+matched pair of tuples alternately to include each next element. The order
+clauses preserve and reflect equality and order, so their union is a
+bijective order isomorphism, hence a Boolean isomorphism.
+
+For the last assertion fix \(\bar a\). For each tuple of the same length
+outside its orbit choose a distinguishing finite-level formula true of
+\(\bar a\), negating it if necessary. Move each test to a finite
+\(\Sigma\) level and conjoin. This is a \(\Pi_\omega\) definition of the
+orbit inside \(A\), also when the list of exclusions is empty.
+\end{proof}
+\section{Points of distinguishable finite degrees}\label{sec:packets}
+We need infinitely many distinguishable compact spaces, each recognizable
+at some finite logical level. We construct them from finite-height scattered
+spaces and Cantor space \(K=\{0,1\}^{\N}\) with the product topology. A cylinder
+in \(K\) prescribes finitely many initial bits. Write \(E\cong F\) for homeomorphism
+and say that \(E\) \emph{absorbs} \(F\) if \(E\sqcup F\cong E\).
+A clopen summand of \(E\) that absorbs \(F\) makes \(E\) absorb \(F\)
+as well, by using the identity on its complement.
+
+\begin{definition}
+Set \(T_0=\{*\}\), \(T_{d+1}=\mathcal K(T_d:i\in\N)\), and define the
+\emph{packet of degree \(d\)} by
+\[
+ G_d=\mathcal K(K\sqcup T_d:i\in\N).
+\]
+In any Stone space \(X\) let \(D=\overline{\operatorname{Iso}(X)}\), the
+closure of its isolated points. Define the degree-\(d\) marker set by
+\begin{equation}\label{eq:marker}
+ M_d(X)=\bigl(D\cap\overline{X\setminus D}\cap D^{(d+1)}\bigr)
+                         \setminus D^{(d+2)}.
+\end{equation}
+\end{definition}
+
+\begin{lemma}\label{lem:packets}
+The set \(M_j(G_d)\) is the singleton consisting of the apex for \(j=d\)
+and is empty for \(j\ne d\). Each \(M_j\) is local and has a finite-level
+incidence test.
+\end{lemma}
+\begin{proof}
+Isolated points are dense in \(T_d\). Also \(T_d^{(d)}\) is a singleton
+and \(T_d^{(d+1)}\) is empty, where the derivative starts from the entire
+space. Both assertions follow by induction: each component restriction is
+the derivative in \(T_{d-1}\), and the apex survives the next derivative
+precisely when infinitely many components still contribute. In \(G_d\)
+the set \(D\) consists of the tower components and the apex, and its
+complement consists of the Cantor components. Thus \(D\cap\overline{X\setminus
+D}\) consists of the apex alone. In fact \(D^{(d+1)}\) is the singleton
+consisting of the apex, and \(D^{(d+2)}\) is empty by the same component calculation. This gives
+the claimed marker.
+
+A clopen contains an isolated point exactly when it lies above an atom,
+a nonzero Boolean element with no nonzero proper part. This gives a
+finite-level test for \(\operatorname{Iso}(X)\) and for its closure.
+Apply Lemma~\ref{lem:hit} to the successive closed derivatives, to the
+complement of \(D\), to its closure and to the closed intersections in
+\eqref{eq:marker}, followed by the final difference. All these operations
+commute with restriction to open sets. The bound may depend on \(j\).
+\end{proof}
+
+\begin{lemma}\label{lem:fragments}
+Every clopen in a \(T_d\) is empty or is a finite positive disjoint sum
+of copies of a single \(T_q\), \(q\le d\). A clopen of \(G_d\) containing
+its apex is homeomorphic to \(G_d\). A clopen missing its apex consists of
+an optional copy of \(K\) and an empty or finite positive sum of copies of
+one \(T_q\), \(q\le d\). Every one of these homeomorphism types, including
+\(G_d\) itself, can be specified among countable clopen algebras by a
+finite-level sentence.
+\end{lemma}
+\begin{proof}
+A repeated compactified sum absorbs an extra copy of its repeated component:
+shift the component indices and fix the apex. Thus \(T_{q+1}\) absorbs
+\(T_q\), and it absorbs every lower tower by applying the induction
+hypothesis inside one of its components. In a finite union of towers the
+greatest height absorbs all lower heights. The clopen description of
+\(\mathcal K\) now proves the assertion for a tower by induction. An
+apex-free clopen is a finite union of lower fragments. An apex-containing
+one contains a complete tail homeomorphic to the whole tower, with only
+finitely many lower fragments left over. Likewise in \(G_d\) the punctured
+sum can be rearranged into one infinite list of Cantor components and
+one infinite list of towers of height \(d\). Shifting either list proves
+absorption of \(K\) and \(T_d\); a tower component absorbs lower towers.
+A nonempty clopen of \(K\) is a finite union of cylinders, each homeomorphic
+to \(K\), and any finite positive number of Cantor spaces is again \(K\)
+by a finite cylinder partition. These observations give the two clopen
+forms in \(G_d\).
+
+Here are the logical bounds. Write \(\#P\) for cardinality truncated to
+\(\N\cup\{\infty\}\). Within \(G_d\), a clopen sign cell \(U\) containing
+the apex is detected by a nonzero count of \(D^{(d+1)}\). For the other
+cells the counts of \(D^{(k)}\), \(0\le k\le d\), determine the tower
+part. If it is nonempty, the last nonzero stage is its height \(q\) and
+that stage counts precisely its multiplicity. The count in the ordinary
+\((d+1)\)-st derivative of the whole space detects the Cantor part by
+being nonzero. All counts here are taken in \(U\); locality identifies
+them with counts in the corresponding loci of the ambient space. In a
+fixed tower the ordinary derivative counts up to its height likewise
+determine the clopen type. Within \(K\) only emptiness of each cell
+matters.
+
+For each reference tuple record every finite threshold satisfied or failed
+by each of these counts on each sign cell. These data define the orbit:
+equal data give homeomorphic cells, and the cell maps glue. The formulas
+have a \emph{common finite bound} for a fixed ambient \(G_d\), \(T_d\)
+or \(K\). Indeed the list of loci is finite, the threshold bound in
+Lemma~\ref{lem:hit} is independent of the threshold, and substitution of
+a sign term does not change the level. Put every assertion or its negation
+at a common finite \(\Sigma\) level one step higher if necessary; a single
+countable conjunction gives a finite \(\Pi\) level independent of tuple
+length. Lemma~\ref{lem:orbits} gives a finite-level Scott sentence in
+each case. The empty space is specified by \(0=1\). Finally, if two
+spaces have finite-level Scott sentences, their disjoint sum can be tested
+by asking for a clopen and its complement satisfying the two relativized
+sentences. Stone duality gives the converse. This proves the assertion
+for every finite sum appearing in the classification.
+\end{proof}
+
+\section{Rows, vertex charts, and their Scott sentences}\label{sec:charts}
+The same family of packets serves two purposes. Odd degrees indicate
+which rows are present. Even degrees will measure the change when an
+extra row is added. For \(e,n\in\N\) and nonempty \(S\subseteq\N\), set
+\begin{align}
+ R_{e,n}
+   &=\left(\;\coprod_{j\ge n}G_{2j}\ \sqcup\
+                 \coprod_{k\in\N}G_{2e+1}\right)^+ ,\label{eq:row}\\
+ C_S&=\left(\coprod_{e\in S,\ k\in\N}R_{e,e+k}\right)^+ .\label{eq:chart}
+\end{align}
+Here \(+\) as a superscript means to adjoin the compactification point.
+We call \(e\) the \emph{tag}, \(n\) the \emph{cutoff}, the apex of a row
+its \emph{root}, and the apex of a chart its \emph{vertex}. A packet of
+degree \(2j\) occupies \emph{column \(j\)}. Write
+\[
+    A_e(X)=M_{2e+1}(X)'',\qquad P_e(X)=M_{2e+1}(X)'\setminus A_e(X).
+\]
+These are local and have finite-level incidence tests for each \(e\);
+\(A_e\) is closed and \(P_e'\subseteq A_e\).
+In a chart \(A_e\) will identify the vertex while \(P_e\) identifies
+the row roots of tag \(e\).
+
+\begin{lemma}\label{lem:census}
+In \(R_{a,n}\), \(P_e\) consists of the root if \(a=e\) and is empty
+otherwise; every \(A_e\) is empty. In \(C_S\), \(A_e\) consists of the
+vertex if \(e\in S\) and is empty otherwise; \(P_e\) consists exactly of
+the roots of rows of tag \(e\). The points of \(M_{2j}\) are precisely the
+apices of the packets in column \(j\). In particular their number in a
+chart is finite.
+\end{lemma}
+\begin{proof}
+A row root lies in \(D^{(m)}\) for every finite \(m\): arbitrarily late
+even packets contain points in each fixed stage of \(D\), and the apex
+test gives the next stage at the root. The chart vertex also lies in every
+finite stage, since infinitely many row roots do. Thus neither kind of
+point belongs to any \(M_j\). All other points are in clopen packets and
+Lemma~\ref{lem:packets} applies. In a row the infinitely repeated odd
+marker accumulates exactly at its root; there is at most one marker of
+each even degree. In a chart the rows containing odd markers of tag \(e\)
+are exactly the infinitely many rows with first index \(e\), if any.
+Consequently the first derivative consists of their roots together with
+the vertex when this tag occurs, and its next derivative consists of the
+vertex alone. In column \(j\) the contributing row indices satisfy
+\(e+k\le j\), giving at most \((j+1)(j+2)/2\) points.
+\end{proof}
+
+\paragraph{A chart with two tags.}
+Take \(S=\{0,2\}\). The entry in each column below counts the rows of
+the indicated tag that supply a packet in that column.
+\begin{center}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Column \(j\) & \(0\) & \(1\) & \(2\) & \(3\)\\
+\midrule
+Rows of tag \(0\) with cutoff \(\le j\) & 1 & 2 & 3 & 4\\
+Rows of tag \(2\) with cutoff \(\le j\) & 0 & 0 & 1 & 2\\
+\midrule
+Number of points of \(M_{2j}\) & 1 & 2 & 4 & 6\\
+\bottomrule
+\end{tabular}
+\end{center}
+For instance, column \(2\) receives one marker from each of the three
+tag-\(0\) rows with cutoffs \(0,1,2\), and one from the tag-\(2\) row
+of cutoff \(2\). The infinitely many odd packets in each of these rows
+contribute nothing to the even count. Conversely, the even counts are
+insensitive to the tag of an added row: adjoining one row of cutoff zero
+increases \emph{every} even-column count by one. Tracking where this
+extra unit can go will force a branch in Section~\ref{sec:absorb}.
+
+\subsection{Matching rows across a family of columns}
+\begin{lemma}\label{lem:match}
+Consider two disjoint sums of rows with countable row sets. Suppose there
+is a tag-preserving bijection of their row sets. The cutoff of a row may
+change under the bijection. If in each column the two numbers of eligible
+rows (cutoff at most the column index) are finite and equal, then the sums
+are homeomorphic by a map inducing the prescribed bijection on roots.
+The map extends to their one-point compactifications.
+\end{lemma}
+\begin{proof}
+Identify the row sets by the specified bijection. In column \(j\) let
+\(I_j,J_j\) be the two finite eligible sets. Fix the common elements and
+choose any bijection \(I_j\setminus J_j\to J_j\setminus I_j\); equality
+of the column sizes permits this. Map the even packets using these
+bijections and the identity on their model \(G_{2j}\). In each paired
+row map its odd packets bijectively, preserving the repeated degree.
+Map each root to its partner. This defines a bijection of the whole sums.
+
+For row \(i\) the maps in all columns beyond the maximum of its two
+cutoffs fix \(i\), in \emph{both} directions. Only finitely many packets
+therefore depart from or enter this row from a different row. Given a
+neighborhood of the target root, discard these finitely many departures
+and the preimages of the finitely many exceptional packets in the
+neighborhood. What remains contains a neighborhood of the source root.
+The inverse has the same property. All other points lie in open packets.
+A homeomorphism takes compact sets to compact sets in both directions,
+so extending it by the point at infinity is continuous with continuous
+inverse.
+\end{proof}
+
+\subsection{Recognizing an arbitrary clopen in a chart}
+Given a clopen \(U\subseteq C_S\), write \(\epsilon(U)=1\) if it contains
+the vertex and \(0\) otherwise. Call a row \emph{retained} if its root
+belongs to \(U\), and write \(I_U\) for the set of retained row indices.
+A portion of \(U\) can cut through a packet; agreement just on which roots
+are present would lose this information. We separate the full tails from
+the finitely many pieces where such cuts can occur.
+
+\begin{lemma}\label{lem:core}
+For every \(U\) there exists \(J_0\) such that for each \(J\ge J_0\)
+there is a clopen \(U^*\subseteq U\) with the following description.
+For each retained row \(i=(e,k)\), its part in \(U^*\) is a full row of
+tag \(e\) and cutoff \(\max(J,e+k)\) up to homeomorphism. There are no
+other rows in \(U^*\). Adjoin the outer vertex exactly when
+\(\epsilon(U)=1\). For \(j\ge J\), the number of eligible rows in this
+description is precisely \(\#(U\cap M_{2j})\).
+The remainder \(U\setminus U^*\) is a finite disjoint sum of full mixed
+packets \(G_d\) and a space consisting of an optional Cantor part and
+finitely many towers of bounded height.
+\end{lemma}
+\begin{proof}
+Outside finitely many rows \(F\), membership in \(U\) is constant on the
+entire row, with value \(\epsilon(U)\). In each row of \(F\) the same
+description at the row root gives finitely many exceptional packets.
+Choose \(J_0\) after all exceptional even columns in these rows. Choose
+an odd starting index after their exceptional odd packets, separately
+for each exceptional row; in other rows use odd starting index zero.
+In a retained row take its root, its even packets in columns \(j\ge J\)
+and all its odd packets from the chosen starting index onwards. This
+clopen is a row of the asserted type by reindexing its odd packets.
+Take the empty set in the other rows. Outside \(F\) only rows with
+\(e+k<J\) could have a changed restriction. There are finitely many of
+these, hence the indicated vertex bit makes \(U^*\) clopen in the chart.
+Our choices ensure \(U^*\subseteq U\). Above the cut \(J\), membership
+of every whole even packet in \(U\) is exactly its row-root bit;
+Lemma~\ref{lem:census} gives the column count.
+
+The difference is compact, misses the vertex, and hence meets only
+finitely many rows. Its restriction to each is compact and misses the
+row root, so meets only finitely many packets there. Apply
+Lemma~\ref{lem:fragments} in each of these packets to get the statement
+about the remainder.
+\end{proof}
+
+\begin{proposition}\label{prop:chart}
+For every nonempty \(S\subseteq\N\), the Boolean algebra \(\Clop(C_S)\)
+has a \(\Pi_{\omega+2}\) Scott sentence among countable Boolean algebras.
+\end{proposition}
+\begin{proof}
+First compare two clopens \(U,V\) of this chart agreeing on every unary
+finite-level test. By Lemmas~\ref{lem:hit} and~\ref{lem:census}, they have
+the same vertex bit (test \(A_e\) for some \(e\in S\)), the same extended
+number of retained roots of each tag (test \(P_e\)), and the same count
+of \(M_d\) for each \(d\). These assertions follow from all finite
+thresholds; in the infinite case the sets of row indices are countable.
+
+If \(U\) has no retained root, it misses the vertex, since any vertex
+neighborhood contains all but finitely many whole rows. The argument for
+the remainder in Lemma~\ref{lem:core} expresses \(U\) as a finite sum
+of packet fragments. It has a finite-level Scott test by
+Lemma~\ref{lem:fragments} and finite splitting. Relativizing that test to
+the clopen gives \(V\cong U\), including \(U=\varnothing\).
+
+If there is at least one retained row, choose a common threshold \(J\)
+for both applications of Lemma~\ref{lem:core}. For every tag use the
+equality of finite cardinalities or a bijection between the two countably
+infinite fibers to pair all retained roots. The two cores have zero
+eligible rows below \(J\). At and above \(J\) they have equal finite
+column counts by the lemma. Lemma~\ref{lem:match} matches their rows,
+and the common vertex bit gives a homeomorphism of the cores.
+Write \(H\) for their common homeomorphism type.
+
+A retained row absorbs any bounded tower remainder and any Cantor part:
+it contains a clopen even packet of degree above the height bound, and
+this packet absorbs these spaces by Lemma~\ref{lem:fragments} and its
+proof. It also absorbs one more odd packet of its own tag by shifting
+its infinitely many such packets. Both absorptions extend across the
+rest of the core. It remains to compare the finite multiplicities of
+the packets in the two remainders. In the remainder the multiplicity of
+\(G_d\) equals the count of \(M_d\), since in a tower \(D\) is the whole
+space and in Cantor space \(D\) is empty. For even \(d\) the common core count is finite;
+subtract it from the equal total counts in \(U,V\). For odd \(d=2e+1\)
+with no retained row of tag \(e\), the core count is zero. For all
+remaining odd degrees, \(H\) absorbs every finite multiplicity of the
+packet. This accounts for every summand, giving \(U\cong V\) without
+subtracting two infinite cardinals.
+
+Now take tuples in \(\Clop(C_S)\) agreeing on all finite-level formulas.
+Their corresponding sign cells agree on every unary finite-level test
+by substitution, so the preceding comparison gives homeomorphisms on
+all corresponding cells. Gluing proves that the tuples are automorphic.
+Apply Lemma~\ref{lem:orbits}.
+\end{proof}
+
+One additional consequence of the matching argument will be used on a
+branch. It permits exchanging two rows, even when their tags differ.
+
+\begin{lemma}\label{lem:exchange}
+If \(U\subseteq C_S\) is clopen and contains the vertex, \(a,b\in S\),
+and \(n\in\N\), then \(U\sqcup R_{a,n}\cong U\sqcup R_{b,n}\).
+\end{lemma}
+\begin{proof}
+Use the decomposition in Lemma~\ref{lem:core}. The core compactifies its
+retained rows, with infinitely many of every tag in \(S\): a neighborhood
+of the vertex contains all but finitely many whole rows. A separate
+compact row can be included as one additional index before compactifying,
+since a finite extra compact component does not change the neighborhood
+basis at the outer vertex. On the two sides the enlarged row sets still
+have the same cardinality in each tag. The extra rows have equal cutoff,
+so each column has the same finite size on the two sides. Match the
+enlarged arrays by Lemma~\ref{lem:match} and restore the identical
+remainder by the identity.
+\end{proof}
+\section{A Boolean sentence associated with a tree}\label{sec:guard}
+Write \(\mathcal V=\N^{<\omega}\) for all finite sequences of natural
+numbers, \(o\) for the empty sequence and \(vi\) for \(v\) followed by
+\(i\). A tree \(T\subseteq\mathcal V\) is closed under initial segments.
+An infinite branch is a sequence all of whose finite prefixes lie in \(T\).
+We use \emph{all} of \(\mathcal V\) as vertex indices, even for the empty
+tree. The tree determines which edges are retained: the edge from \(v\) to
+\(vi\) is retained exactly when \(vi\in T\).
+
+Assign distinct natural numbers to the symbols \(p_v\) and \(s_{v,i}\)
+using a fixed injection of their disjoint union into \(\N\).
+The former are private tags and the latter are edge tags. Put
+\[
+ S_v=\{p_v\}\ \cup\
+ \{s_{u,i}:ui\in T,\ v=u\text{ or }v=ui\},\qquad
+ R=R_{p_o,0},\qquad B=\Clop(R).
+\]
+Only \(S_v\) depends on \(T\). For example, if \(T\) consists of \(o\)
+and its one child \((3)\), then \(S_o=\{p_o,s_{o,3}\}\) and
+\(S_{(3)}=\{p_{(3)},s_{o,3}\}\). Every other chart has only its private
+tag. Extending the tree by a child of \((3)\) gives that chart one more
+tag, shared with the new child. In particular \(B\) is a fixed countably
+infinite Boolean algebra. A retained edge shares one tag between two charts.
+A private tag identifies a single vertex even in the presence of symmetries
+of the tree.
+
+We say that a Stone space \(X\) satisfies the following \emph{tree
+conditions} when all six requirements hold. The points in the conditions
+are determined by the marker sets of \(X\).
+\begin{enumerate}
+\item For each \(v\), \(A_{p_v}(X)\) is a singleton, written \(\{z_v\}\).
+\item The \(z_v\) are pairwise distinct.
+\item For \(vi\in T\), \(A_{s_{v,i}}(X)\subseteq\{z_v,z_{vi}\}\).
+\item For each \(v\) there is a clopen \(D_v\ni z_v\) homeomorphic to
+\(C_{S_v}\).
+\item Every clopen \(U\) contains either finitely many or cofinitely many
+of the \(z_v\).
+\item For each \(j\), every clopen containing infinitely many \(z_v\)
+contains a clopen copy of \(G_{2j}\).
+\end{enumerate}
+By locality and Lemma~\ref{lem:census}, any homeomorphism onto \(D_v\)
+takes the vertex to \(z_v\), and \(D_v\) contains no other \(z_w\).
+Indeed \(p_w\notin S_v\) for \(w\ne v\). The conditions permit other
+points and clopen subspaces outside these charts.
+
+\begin{proposition}\label{prop:guard}
+For each \(T\) there is a pure Boolean \(\Pi_{\omega+4}\) sentence
+\(\Psi_T\) which, on countable Boolean algebras, expresses the tree
+conditions on the Stone space. It has a countable Boolean model, and every
+such model is infinite.
+\end{proposition}
+\begin{proof}
+For the sentence, express the first three conditions using
+Lemma~\ref{lem:hit}. For example, a closed locus is a singleton if the
+whole space meets it and no two disjoint clopens both meet it. Two
+singletons differ if a clopen separates them. Inclusion of one closed
+locus in the union of two others means every clopen meeting the first meets
+at least one of the other two. Each individual test has finite level. For
+a clopen \(U\) put
+\[
+ \mathrm{Fin}(U)=
+ \bigvee_{F\subseteq_{\rm fin}\mathcal V}
+                 \ \bigwedge_{v\notin F}\neg\Hit_{A_{p_v}}(U).
+\]
+The inner tests have possibly unbounded finite levels, so this formula is
+\(\Sigma_{\omega+1}\). The fifth condition is
+\(\forall U\,(\mathrm{Fin}(U)\vee\mathrm{Fin}(U^c))\). For each \(j\)
+the sixth says that for all \(U\), either \(\mathrm{Fin}(U)\) holds or
+some \(V\le U\) has interval algebra isomorphic to \(\Clop(G_{2j})\).
+The latter alternative has finite level by the packet Scott sentence and
+relativization to \(V\). Both universal requirements are therefore
+\(\Pi_{\omega+2}\).
+
+For the fourth condition use the \(\Pi_{\omega+2}\) chart Scott sentence
+of Proposition~\ref{prop:chart} on the interval below \(D_v\), conjoin
+\(\Hit_{A_{p_v}}(D_v)\), then quantify existentially over \(D_v\).
+For fixed \(v\) this is \(\Sigma_{\omega+3}\); the conjunction over \(v\)
+is \(\Pi_{\omega+4}\). The other conditions fit inside the same bound.
+Every quantifier used here ranges over elements of the Boolean algebra.
+Stone duality gives the claimed equivalences since interval algebras of
+countable Boolean algebras are countable.
+
+For an explicit witness take the one-point compactification of the sum
+of one chart \(C_{S_v}\) for each \(v\) and, separately, one copy of
+\(G_{2j}\) for each \((j,k)\in\N^2\). Its algebra of clopens is countable
+by the finite-exception description of a clopen at each compactification.
+In each chart the markers are as in Lemma~\ref{lem:census}. No reserve
+packet has an odd marker. The outer point lies in every finite derivative
+of the closure of isolated points (already the chart vertices do), so it
+has no finite degree. For a fixed odd degree all its markers lie in the
+at most two charts supporting its tag. This finite union is clopen. Taking
+derivatives therefore creates no new anchor at the outer point. The
+private and edge requirements follow. A clopen containing the outer point
+contains all but finitely many whole components, hence infinitely many
+vertices and a copy of each reserve degree. Its complement contains only
+finitely many vertices. This gives all six conditions. Finally, any space
+satisfying them has infinitely many distinct vertices; a finite Boolean
+algebra has a finite Stone space.
+\end{proof}
+
+There is one further consequence in an arbitrary space satisfying the
+conditions. The set of named vertices has exactly one accumulation point
+\(t\). There is at least one by compactness. Two would admit disjoint
+clopen neighborhoods each containing infinitely many vertices, contradicting
+the finite-or-cofinite condition. Every neighborhood of \(t\) contains
+all but finitely many vertices: otherwise its compact clopen complement,
+after shrinking the neighborhood to a clopen, would contain another
+accumulation point. Each \(D_v\) meets the vertex set in one point, so
+\(t\notin D_v\). The point \(t\) controls continuity of the infinite
+construction below.
+\section{Absorption in every model of the tree conditions}\label{sec:absorb}
+Fix \(T\) and a space \(X\) with countably many clopens satisfying the six
+conditions. We prove the criterion in both directions. The necessity
+argument uses only differences on which the counts are finite. The
+sufficiency argument constructs the homeomorphism on clopens small enough
+to glue at \(t\).
+
+\subsection{How an additional row forces a branch}
+For a clopen \(U\) write \(E_j(U)=\card{M_{2j}(X)\cap U}\) and
+\(N_e(U)=\card{P_e(X)\cap U}\); the ambient space will be clear from the
+clopen. These quantities are invariant under homeomorphisms of clopens by
+locality. Individual \(N_e\)'s can be infinite on a neighborhood of a
+vertex.
+\begin{lemma}\label{lem:balance}
+If \(U\) is a clopen in a row, or a clopen in a chart missing its vertex,
+then the \(N_e(U)\) are finite, have finite support in \(e\), and
+\[
+                  E_j(U)=\sum_e N_e(U)\quad\text{for all sufficiently large } j.
+\]
+\end{lemma}
+\begin{proof}
+In a row the only possible root is its own. A clopen missing it meets
+finitely many packets, hence misses every sufficiently large even degree.
+A clopen containing the root includes every packet except possibly
+finitely many, so contains the unique even marker in every sufficiently
+large column. This gives the formula in a row. A chart clopen missing its
+vertex meets only finitely many rows. Apply the row calculation to its
+intersection with each row, take the maximum of the finitely many
+thresholds, and add.
+\end{proof}
+
+Suppose \(h:X\sqcup R\longrightarrow X\) is a homeomorphism. The added
+row has no private anchor; locality shows that \(h\) sends the copy of
+each \(z_v\) to \(z_v\). Enumerate \(\mathcal V\) and make the charts
+disjoint by taking \(U_v\) equal to \(D_v\) with all earlier \(D_w\)'s
+removed. These clopens still contain their respective vertices. In the
+source of \(h\), take \(U_v\) for \(v\ne o\), and \(U_o\sqcup R\) for
+\(v=o\); call their images \(V_v\). The \(V_v\)'s are also disjoint and
+contain their respective \(z_v\)'s. We compare the two families in \(X\);
+their unions need not cover \(X\).
+
+Both \(U_v\setminus V_v\) and \(V_v\setminus U_v\) satisfy
+Lemma~\ref{lem:balance}, in the second case after pulling back by \(h\)
+and allowing the separate clopen piece in \(R\) at \(v=o\). Define
+\[
+ d_v(e)=N_e(V_v\setminus U_v)-N_e(U_v\setminus V_v)\in\mathbb Z .
+\]
+This function has finite support contained in \(S_v\). Indeed the two
+pieces come from a part of \(D_v\) and, possibly, a part of the added row
+of tag \(p_o\in S_o\). Each \(E_j(U_v)\) is finite by
+Lemma~\ref{lem:census}. The homeomorphism gives
+\(E_j(V_v)=E_j(U_v)+\mathbf1_{\{v=o\}}\), since \(R\) has one marker
+in every even column. Cancel the common intersection in this finite
+equality and take \(j\) beyond the two thresholds of
+Lemma~\ref{lem:balance}. We obtain the first of the following identities:
+\begin{align}
+ \sum_e d_v(e)&=\mathbf1_{\{v=o\}},\label{eq:sum}\\
+ d_v(p_v)&=0,\label{eq:private}\\
+ d_v(s_{v,i})+d_{vi}(s_{v,i})&=0 \qquad(vi\in T).\label{eq:edge}
+\end{align}
+
+For~\eqref{eq:private}, put \(e=p_v\). Since \(P_e'\subseteq A_e=\{z_v\}\),
+the set \(P_e\) has finite intersection with the compact exterior of
+\(U_v\), and likewise for \(V_v\). An infinite intersection would have an
+accumulation point there. The exteriors have the same number of \(e\)-roots:
+\(h\) identifies the latter exterior with the source exterior, whose extra
+row is either inside the source sector (\(v=o\)) or has the wrong tag.
+On the set \(P_e\), the difference of the indicators of \(V_v,U_v\)
+is also the difference of the indicators of their complements in reverse
+order. Summing this identity gives zero, exactly~\eqref{eq:private}.
+For~\eqref{eq:edge} use \(e=s_{v,i}\), the unions
+\(U_v\cup U_{vi}\) and \(V_v\cup V_{vi}\), and
+\(P_e'\subseteq\{z_v,z_{vi}\}\). Both exterior counts are finite and equal
+by the same argument; \(R\) has no root of tag \(e\). Disjointness
+within each pair makes the difference of the union indicators the sum
+of the two vertex differences. Only finitely many points contribute to
+each difference. This proves~\eqref{eq:edge} without subtracting two
+infinite counts.
+
+By~\eqref{eq:sum} the root has a positive coordinate. Its private
+coordinate vanishes, so a retained outgoing edge has positive value there.
+At its child the same coordinate is negative by~\eqref{eq:edge}. The
+sum at the child is zero and has finite support, so another coordinate
+is positive. The only possible such coordinate is a retained outgoing
+edge: the private coordinate is zero and the unique incoming edge has
+already been counted. Induction gives an infinite chain of retained edges
+from \(o\). Their child vertices lie in \(T\), and closure under initial
+segments puts \(o\) in \(T\) as well. This gives a branch, even when nodes
+can have infinitely many children.
+
+\subsection{How a branch absorbs the row}
+Conversely let \(v_0=o,v_1,\ldots\) be the successive prefixes of a branch,
+where \(v_{n+1}=v_ni_n\). Put \(a_0=p_o\), \(b_n=s_{v_n,i_n}\),
+and \(a_{n+1}=b_n\). Both \(a_n\) and \(b_n\) lie in \(S_{v_n}\).
+
+We first describe what can be placed in any clopen neighborhood \(H\) of
+both \(z_{v_n}\) and \(t\). In the clopen \(H\cap D_{v_n}\) all but
+finitely many whole chart rows remain. Choose a whole row of tag \(b_n\)
+there, of cutoff \(k\), and remove it from \(H\cap D_{v_n}\). The
+remaining clopen \(L_n\) still contains the vertex. In \(H\setminus
+D_{v_n}\), a clopen neighborhood of \(t\), choose successively disjoint
+clopen copies of \(G_{2j}\), one for each \(j<k\). This is possible by
+condition 6: each chosen packet has no private anchor (its odd markers have
+empty second derivative), hence no vertex, and also misses \(t\). After
+each choice the remaining neighborhood of \(t\) still has infinitely many
+vertices. The removed row together with these packets forms a clopen
+\(Q_n\cong R_{b_n,0}\). Indeed the finite added packet components fill the
+missing even columns below \(k\), and adjoining finitely many compact
+components does not change the neighborhood basis at the row root.
+Set \(W_n=L_n\sqcup Q_n\). It misses \(t\), contains just the named vertex
+\(z_{v_n}\), and lies in \(H\). By Lemma~\ref{lem:exchange},
+\begin{equation}\label{eq:block}
+ L_n\sqcup R_{a_n,0}\ \cong\ L_n\sqcup R_{b_n,0}\ \cong\ W_n.
+\end{equation}
+
+We must choose the neighborhoods so that these local identifications fit
+together. Enumerate a clopen basis \(H_0,H_1,\ldots\) of \(X\). At step
+\(n\) take the union of two clopen neighborhoods: the intersection of the
+\(H_i\), \(i\le n\), which contain \(t\), and the intersection of those
+which contain \(z_{v_n}\) (an empty intersection is \(X\)). Remove the
+previously selected \(W_m\), \(m<n\). The result still contains both
+points, so the preceding construction applies. The \(W_n\) are disjoint.
+For every neighborhood of \(t\), choose \(H_i\) inside it containing
+\(t\). Eventually \(z_{v_n}\in H_i\), since the branch has distinct
+vertices and \(H_i\) contains cofinitely many of them. For all sufficiently
+large \(n\ge i\) both intersections at step \(n\) are contained in
+\(H_i\). Thus every neighborhood of \(t\) contains all sufficiently late
+whole \(W_n\).
+
+On the punctured spaces, map \(R\sqcup L_0\) to \(W_0\), then
+\(Q_{n-1}\sqcup L_n\) to \(W_n\) for \(n\ge1\), using~\eqref{eq:block}
+and \(b_{n-1}=a_n\). Use the identity on the remainder outside all the
+sites. These are disjoint open partitions of the punctured spaces: away
+from \(t\) the sites are locally finite, since they eventually lie in
+any clopen neighborhood of \(t\). The piecewise map and its inverse are
+therefore continuous. Each original space is the one-point compactification
+of its puncture at \(t\); a homeomorphism on the punctures carries compact
+sets to compact sets in both directions and hence extends by \(t\mapsto t\).
+We have constructed \(X\sqcup R\cong X\).
+
+\begin{theorem}\label{thm:absorb}
+For every countable Boolean algebra \(A\models\Psi_T\),
+\[
+                       A\cong A\times B
+       \quad\Longleftrightarrow\quad T\text{ has an infinite branch}.
+\]
+\end{theorem}
+\begin{proof}
+Apply the two directions above to the Stone space of \(A\). Its clopens
+give a countable basis, and \(\Clop(X\sqcup R)=\Clop(X)\times B\) by
+restriction to the two summands.
+\end{proof}
+\section{Borel comparison and the choice of a sentence}\label{sec:diagonal}
+We now have a criterion for when absorption holds. To find a sentence
+all of whose countable models have high rank, we need a second test, for
+agreement with the product up to a specified logical complexity. Unlike
+isomorphism, this second test is Borel at each fixed countable level.
+
+\subsection{Bounded back-and-forth}
+For structures \(M,N\) in the operation signature and tuples
+\(\bar u,\bar v\) of the same finite length, define
+\(F_\alpha(M,\bar u;N,\bar v)\) recursively. Require agreement on all
+equalities between terms at the tuples. In addition, for every
+\(\beta<\alpha\) and \(k<\omega\), every extension of either tuple by a
+\(k\)-tuple must have a matching extension on the other side such that
+the extended tuples satisfy \(F_\beta\). At \(\alpha=0\) only the term
+equalities remain. Write \(M\equiv_\alpha N\) for this comparison of the
+empty tuples.
+
+\begin{lemma}\label{lem:bf}
+Tuples satisfying \(F_\alpha\) agree on all \(\Sigma_\alpha\) and
+\(\Pi_\alpha\) formulas. Isomorphic structures satisfy the comparison at
+all levels on corresponding tuples. For fixed countable \(\alpha\), on
+fixed countable domains, the comparison is Borel whenever each atomic
+term equality is Borel in the parameters.
+\end{lemma}
+\begin{proof}
+For transfer use induction on the formation of the level. Atomic
+agreement handles the quantifier-free case. If a disjunct
+\(\exists\bar y\,\theta\) is true, choose its finite witness and use the
+extension condition at the level \(\beta<\alpha\) of \(\theta\).
+Induction transfers its truth. The reverse transfer uses extension in the
+other direction. Negation gives the universal case. An isomorphism and
+its inverse supply matching extensions at every stage by induction.
+Finally a Borel set is one built from open sets by countable unions and
+complements. The term tests form a countable intersection. At a
+countable ordinal the smaller ordinals, all block lengths, and all finite
+tuples in either domain each form countable sets. The recursion thus uses
+only countable intersections and unions of previously Borel relations.
+\end{proof}
+
+\subsection{A nonanalytic family of branchless parameters}
+Let \(\Baire=\N^{\N}\) have the product topology of discrete copies of
+\(\N\). Its basic open sets prescribe finite prefixes. Recall that in
+standard Borel spaces (measurable spaces isomorphic to Borel subsets of
+Polish spaces), projections of Borel sets are \emph{analytic}. Every
+nonempty analytic subset of \(\Baire\) is the range of a continuous map
+from \(\Baire\)~\cite[\S14]{kechris}. A Polish space is a separable,
+completely metrizable space.
+
+Fix an injective coding \(\langle u,v\rangle\in\N\) of pairs of finite
+sequences. Given \(c,x\in\Baire\) form the tree
+\[
+ s\in T(c,x)\quad\Longleftrightarrow\quad
+ \forall m\le\card{s},\quad c(\langle x\res m,s\res m\rangle)\ne0.
+\]
+Here \(\res m\) takes the prefix of length \(m\), including the empty
+prefix at \(m=0\). Put \(T_c=T(c,c)\) and \(W=\{c:T_c\text{ has no
+branch}\}\). Membership of a fixed node in \(T_c\) is clopen in \(c\):
+the prefix used in the indices and the finitely many values at those
+indices can all be fixed in a neighborhood of each \(c\).
+
+\begin{lemma}\label{lem:diag}
+The set \(W\) is not analytic.
+\end{lemma}
+\begin{proof}
+Given a continuous \(f:\Baire\to\Baire\), let \(d\) be the zero-one code
+marking all pairs \(\langle f(y)\res n,y\res n\rangle\) for all \(y,n\).
+Then \(T(d,x)\) has a branch exactly when \(x\) lies in the range of \(f\).
+Indeed, \(f(y)=x\) gives the branch \(y\). Conversely, from a branch
+\(y\) choose \(z_n\) with \(z_n\res n=y\res n\) and
+\(f(z_n)\res n=x\res n\), using the marked pair of length \(n\).
+Then \(z_n\to y\), \(f(z_n)\to x\), and continuity gives \(f(y)=x\).
+The all-zero parameter belongs to \(W\), so if \(W\) were analytic, some
+continuous \(f\) would have range \(W\). At its own code \(d\) the
+equivalence just proved says \(T_d\) has a branch if and only if
+\(d\in W\), a contradiction.
+\end{proof}
+
+\subsection{Why truth of the varying sentence is jointly Borel}
+Encode a structure on \(\N\) by two constants and the value tables for
+the unary and the two binary operations. The space \(\mathcal T\) of such
+tables, a countable product of countable discrete spaces, is Polish.
+Evaluation of a fixed term at a fixed tuple depends locally on finitely
+many entries, by induction over the term. Boolean tables form a Borel
+set by imposing the Boolean identities on all tuples. For a fixed
+infinitary formula, truth at a fixed tuple is Borel by induction: the
+quantifiers over \(\N\) and the logical conjunctions and disjunctions are
+countable.
+
+\begin{proposition}\label{prop:borel}
+The set of pairs
+\[
+ \mathcal G=\{(c,m)\in\Baire\times\mathcal T:
+             m\text{ is Boolean and }m\models\Psi_{T_c}\}
+\]
+is Borel.
+\end{proposition}
+\begin{proof}
+The singleton, distinctness, finite-or-cofinite and reserve requirements
+use fixed formulas. For an edge the condition is the implication from
+membership of its child in \(T_c\) to a fixed inclusion test. Intersecting
+over edges is Borel. The chart condition is different. The chart to be
+recognized depends on \(c\), and Proposition~\ref{prop:chart} alone
+supplies no uniform choice of Scott sentence. We check the semantic
+condition using a single countable supply of codes.
+
+Use all clopens of the universal chart \(C_{\N}\) as codes. Restrict a
+code to its vertex and to the rows \((e,k)\) with \(e\in S_v(T_c)\).
+This gives a surjection onto \(\Clop(C_{S_v(T_c)})\): a clopen of the
+smaller chart extends by assigning its vertex bit constantly on all
+discarded rows. The finite-exception criterion proves the extension
+clopen. Restriction preserves all Boolean operations. For any fixed two
+term values on a tuple of codes, their restrictions are equal exactly when
+their vertex bits agree and
+\[
+ \forall e,k,\qquad e\in S_v(T_c)\ \Longrightarrow\
+       \text{the two values agree throughout row }(e,k).
+\]
+The row values here are taken once in the universal chart. Whether
+\(e\in S_v(T_c)\) is Borel: the tag is private, unused, or names a
+specific edge, whose incidence and retention determine the answer.
+This makes every atomic term equality Borel in \(c\).
+
+On the other side, for a proposed chart clopen \(d\) in \(m\), take codes
+\(a\in\N\) for \(a\wedge d\) in the interval below \(d\). This too is
+surjective. Evaluate relative terms with top \(d\) and complement
+\(d\wedge\neg x\); every term test is Borel in the table. On these two
+fixed countable sets of codes apply the recursion of Lemma~\ref{lem:bf}
+using the just described term equalities. The result computes the true
+comparison on the represented algebras. At stage zero this is the
+definition of their term diagrams; at each extension step, a tuple of
+actual elements can be lifted to codes by surjectivity, and any tuple of
+codes represents actual elements. Repeated codes for the same element
+cause no change.
+
+At level \(\omega+2\) this comparison is precisely the desired chart
+isomorphism test. An isomorphism implies comparison. Conversely comparison
+transfers the chart's \(\Pi_{\omega+2}\) Scott sentence to the countable
+interval, so the two algebras are isomorphic. Combine with the fixed test
+that \(d\) meets the private anchor, take the countable union over \(d\),
+then the countable intersection over \(v\). This proves the joint Borel
+assertion on Boolean tables.
+\end{proof}
+
+\subsection{Excluding every low-rank model at once}
+Fix any \(b<\omega_1\). The product \(m\times B\) can be read on the fixed
+countable domain \(\N\times B\), using operations coordinate by coordinate.
+Its atomic term tests are Borel in \(m\). Form the set
+\[
+ P_b=\{c:\exists m\in\mathcal T,\ (c,m)\in\mathcal G
+                     \ \text{and}\ m\not\equiv_{b+1}m\times B\}.
+\]
+Proposition~\ref{prop:borel} and Lemma~\ref{lem:bf} make \(P_b\) a
+projection of a Borel set, hence analytic. If \(T_c\) has a branch, every
+guarded \(m\) absorbs the product by Theorem~\ref{thm:absorb}. An
+isomorphism implies every bounded comparison, so \(c\notin P_b\).
+Thus \(P_b\subseteq W\). Lemma~\ref{lem:diag} gives a parameter
+\(c\in W\setminus P_b\). This choice is the nonconstructive step deciding
+which sentence to use for \(b\).
+
+Every countable Boolean \(A\models\Psi_{T_c}\) is infinite by
+Proposition~\ref{prop:guard}, hence isomorphic to a table on \(\N\).
+The choice \(c\notin P_b\) gives \(A\equiv_{b+1}A\times B\). The choice
+\(c\in W\) gives \(A\not\cong A\times B\). Consequently every
+\(\Pi_{b+1}\) sentence true of \(A\) is true of a nonisomorphic countable
+Boolean algebra, namely \(A\times B\). The product need not itself
+satisfy \(\Psi_{T_c}\): the Scott sentence must distinguish \(A\) from
+every nonisomorphic countable structure. This explains the role of
+projecting the existence of even one failed comparison.
+
+\begin{proof}[Completion of the proof of Theorem~\ref{thm:main}]
+Conjoin \(\Psi_{T_c}\) with the universal Boolean identities. Explicitly
+one may use commutativity and associativity of both lattice operations,
+both absorption identities, distributivity of \(\vee\) over \(\wedge\),
+and \(0\vee x=x,\ x\vee1=1,\ x\wedge\neg x=0,\ x\vee\neg x=1\).
+The lattice laws give a lattice under \(x\le y\) iff \(x\wedge y=x\);
+the remaining laws give its bounds, distributivity and Boolean complement.
+Their universal closures form a \(\Pi_1\) sentence, so the conjunction
+\(\varphi_b\) remains \(\Pi_{\omega+4}\). The Boolean witness of
+Proposition~\ref{prop:guard} satisfies it. Any operation structure
+satisfying the conjunction is a Boolean algebra. If its zero equaled its
+one it would be a singleton, hence a countable model of the tree
+conditions, contradicting Proposition~\ref{prop:guard}. This also proves
+nontriviality for unrestricted model cardinalities. Finally the product
+comparison just proved supplies a nonisomorphic countable competitor
+even within Boolean algebras. Order and operation isomorphisms coincide:
+the operations are determined by the order, and the order is determined
+by meet. Thus a Scott sentence isolating any countable model in the raw
+operation signature cannot have level \(\Pi_{b+1}\).
+\end{proof}
+\clearpage
+\section*{Guide to the formal proof}
+\addcontentsline{toc}{section}{Guide to the formal proof}
+The links below point to the Lean source for the corresponding steps.
+The endpoint theorem is named
+\texttt{BooleanScott.pure\_boolean\_counterexample}. Its quantifiers run over
+arbitrary operation structures for the implication to the Boolean laws
+and over countable operation structures for the failure of Scott isolation.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+Argument in this paper & Entry points in the formalization\\
+\midrule
+Packet types (\S\ref{sec:packets}) &
+\code{MixedPacket}{Mixed packets}, \code{PacketClassification}{classification of clopens},
+\code{PacketScott}{finite-level isolation}\\
+Charts (\S\ref{sec:charts}) &
+\code{ArrayHomeomorphism}{matching the columns},
+\code{ChartCoreMatching}{matching the cores},
+\code{ChartIsolation}{chart Scott sentences},
+\code{RowExchange}{row exchange}\\
+Tree conditions (\S\ref{sec:guard}) &
+\code{TreeWitness}{the explicit witness},
+\code{GuardGeometry}{geometric conditions},
+\code{GuardSentence}{compilation to a Boolean sentence}\\
+Absorption (\S\ref{sec:absorb}) &
+\code{AbsorptionNecessity}{extracting a branch},
+\code{BranchBlocks}{allocating the clopen blocks},
+\code{BranchSchedule}{choosing shrinking sites},
+\code{BranchGluing}{gluing along the branch}\\
+Choice of parameter (\S\ref{sec:diagonal}) &
+\code{Diagonal}{diagonal family}, \code{ChartPresentation}{chart codes},
+\code{GuardBorel}{joint Borel relation}, \code{Reduction}{rank obstruction},
+\code{PureCounterexample}{theorem in the pure signature}\\
+\bottomrule
+\end{tabularx}
+\end{center}
 
 \paragraph{Contributions and review.}
 OpenAI Codex developed the mathematical argument and Lean formalization under
@@ -242,10 +1085,28 @@ expert review is pending.
 This manuscript is licensed under
 \href{https://creativecommons.org/licenses/by/4.0/}{Creative Commons Attribution 4.0 International}.
 
-\begin{thebibliography}{1}
-\bibitem{ght} David Gonzalez and Matthew Harrison-Trainor.
-\emph{Scott Spectral Gaps are Bounded for Linear Orderings}.
-arXiv:2411.12084v1 (2024), introduction and Question~1.9.
-\href{https://arxiv.org/html/2411.12084v1}{Full text}.
+\begin{thebibliography}{9}
+\addcontentsline{toc}{section}{References}
+\bibitem{ght} D. Gonzalez and M. Harrison-Trainor.
+\href{https://arxiv.org/html/2411.12084v1}{Scott spectral gaps are bounded for linear orderings}.
+arXiv:2411.12084v1 (2024). Theorem~1.5 and Question~1.9.
+\bibitem{ht} M. Harrison-Trainor.
+\href{https://doi.org/10.1016/j.aim.2018.03.012}{Scott ranks of models of a theory}.
+\emph{Advances in Mathematics} \textbf{330} (2018), 109--147.
+\bibitem{kechris} A. S. Kechris.
+\href{https://doi.org/10.1007/978-1-4612-4190-4}{\emph{Classical Descriptive Set Theory}}.
+Graduate Texts in Mathematics 156, Springer, 1995.
+\bibitem{ketonen} J. Ketonen.
+\href{https://annals.math.princeton.edu/1978/108-1/p02}{The structure of countable Boolean algebras}.
+\emph{Annals of Mathematics} (2) \textbf{108} (1978), 41--89.
+\bibitem{montalban} A. Montalb\'an.
+\href{https://doi.org/10.1090/proc/12669}{A robuster Scott rank}.
+\emph{Proceedings of the American Mathematical Society} \textbf{143} (2015), 5427--5436.
+\bibitem{scott} D. Scott.
+\href{https://doi.org/10.1016/B978-0-7204-2233-7.50036-8}{Logic with denumerably long formulas and finite strings of quantifiers}.
+In \emph{The Theory of Models}, North-Holland, 1965, 329--341.
+\bibitem{stone} M. H. Stone.
+\href{https://doi.org/10.1090/S0002-9947-1936-1501865-8}{The theory of representations for Boolean algebras}.
+\emph{Transactions of the American Mathematical Society} \textbf{40} (1936), 37--111.
 \end{thebibliography}
 \end{document}
